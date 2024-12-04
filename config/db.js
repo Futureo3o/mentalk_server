@@ -1,22 +1,25 @@
-// db.js
 const { MongoClient } = require("mongodb");
-const url = "mongodb+srv://june:june1274@cluster0.1lwcd.mongodb.net/";
-const dbName = "testDB"; // 사용할 데이터베이스 이름
 
+const url = "mongodb+srv://june:june1274@cluster0.1lwcd.mongodb.net/";
+const dbName = "mentalking";
 let db;
 
 async function connectDB() {
-  if (db) return db;
   try {
-    const client = new MongoClient(url, { useUnifiedTopology: true });
-    await client.connect();
+    const client = await MongoClient.connect(url);
     db = client.db(dbName);
-    console.log("Connected to MongoDB");
-    return db;
+    console.log("MongoDB 연결 성공");
   } catch (err) {
-    console.error("Database connection error:", err);
-    throw err;
+    console.error("몽고디비 연결 에러 : ", err);
+    throw new Error();
   }
 }
 
-module.exports = connectDB;
+const getDB = () => {
+  if (!db) {
+    throw new Error("몽고db에 연결되지 않았습니다.");
+  }
+  return db;
+};
+
+module.exports = { connectDB, getDB };
