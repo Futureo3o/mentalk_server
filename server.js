@@ -23,7 +23,9 @@ app.get("/", (req, res) => {
 
 app.get("/users", async (req, res) => {
   try {
-    connectDB();
+    const newUser =req.body;
+    const result= await UserModel.createUser(newUser);
+    res.status(200).json(result);
   } catch (err) {
     console.error("사용자 추가 중 오류:", err);
   }
