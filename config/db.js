@@ -1,25 +1,18 @@
-const { MongoClient } = require("mongodb");
-
-const url = "mongodb+srv://june:june1274@cluster0.1lwcd.mongodb.net/";
-const dbName = "mentalking";
-let db;
+const mongoose = require("mongoose");
+require("dotenv").config();
 
 async function connectDB() {
   try {
-    const client = await MongoClient.connect(url);
-    db = client.db(dbName);
+    await mongoose.connect(process.env.MONGODB_URL),
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      };
     console.log("MongoDB 연결 성공");
-  } catch (err) {
+  } catch (error) {
     console.error("몽고디비 연결 에러 : ", err);
-    throw new Error();
+    throw new Error("MongoDB 연결 실패");
   }
 }
 
-const getDB = () => {
-  if (!db) {
-    throw new Error("몽고db에 연결되지 않았습니다.");
-  }
-  return db;
-};
-
-module.exports = { connectDB, getDB };
+module.exports = connectDB;
