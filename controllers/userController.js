@@ -5,8 +5,11 @@ const createUser = async (req, res) => {
   try {
     const { name, email, age } = req.body;
     const newUser = new User({ name, email, age });
-    await newUser.save();
-    res.status(201).send("유저 생성 성공");
+    const saveUserd = await newUser.save();
+    res.status(201).json({
+      message: "유저 생성 성공",
+      data: saveUserd,
+    });
     console.log("유저 생성 성공");
   } catch (error) {
     console.error("유저 생성 실패 : ", error);
@@ -29,7 +32,7 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await User.findOne({ _id: id });
+    const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
     }

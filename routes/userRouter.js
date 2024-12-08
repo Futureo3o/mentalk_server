@@ -2,7 +2,7 @@ const express = require("express");
 const userController = require("../controllers/userController");
 const router = express.Router();
 
-//유저 목록 가져오기
+//유저 정보 관련 라우터 설정
 router.get("/", userController.getAllUsers);
 router.get("/:id", userController.getUserById);
 router.post("/", userController.createUser);

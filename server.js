@@ -9,6 +9,7 @@ const express = require("express");
 const connectDB = require("./config/db.js");
 require("dotenv").config();
 const userRouter = require("./routes/userRouter.js");
+const mentorRouter = require("./routes/mentorRouter.js");
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 
 // 라우터 연결
 app.use("/users", userRouter);
+app.use("/mentor", mentorRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(`${process.env.PORT}번 포트에서 서버가 실행 중...`);
