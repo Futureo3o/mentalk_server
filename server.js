@@ -3,7 +3,8 @@
 // npm i nodemon --save-dev
 // npm i mongodb  --save
 // npm i mongoose
-// npm i dotenv
+// npm i dotenv....
+//test
 
 const express = require("express");
 const connectDB = require("./config/db.js");
@@ -27,4 +28,4 @@ app.listen(process.env.PORT, () => {
 
 app.get("/", (req, res) => {
   res.send("서버 접속 성공");
-});
+})
