@@ -10,8 +10,8 @@ const createMentorUser = async (req, res) => {
       mentor_email,
       mentor_phone,
       mentor_nickname,
-      mentor_img,
-      mentor_paper_img,
+      mentor_img = null,
+      mentor_paper_img = null,
       mentor_company,
       mentor_category,
       mentor_position,
@@ -19,10 +19,25 @@ const createMentorUser = async (req, res) => {
       mentor_is_checked,
       mentor_social_login,
       mentor_gender,
-      mentor_warnning_count,
-      mentor_favorite_count,
-      mentor_suspension,
+      mentor_warnning_count = 0,
+      mentor_favorite_count = 0,
+      mentor_suspension = false,
     } = req.body;
+
+    const existingMentorById = Mentor.findOne({ mentor_id });
+    const existingMentorByEmail = Mentor.findOne({ mentor_email });
+
+    if (existingMentorById) {
+      return res.status(400).json({
+        error: "이 ID는 이미 사용중입니다. 다른 ID를 선택해주세요.",
+      });
+    }
+
+    if (existingMentorByEmail) {
+      return res.status(400).json({
+        error: "이 이메일은 이미 사용 중입니다. 다른 이메일을 선택해주세요.",
+      });
+    }
 
     const newMentor = new Mentor({
       mentor_id,
@@ -39,9 +54,9 @@ const createMentorUser = async (req, res) => {
       mentor_is_checked,
       mentor_social_login,
       mentor_gender,
-      mentor_warnning_count: mentor_warnning_count || 0, // 기본값 설정
-      mentor_favorite_count: mentor_favorite_count || 0, // 기본값 설정
-      mentor_suspension: mentor_suspension || false,
+      mentor_warnning_count,
+      mentor_favorite_count,
+      mentor_suspension,
     });
 
     const savedMentor = await newMentor.save();
