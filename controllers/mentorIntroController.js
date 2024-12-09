@@ -34,6 +34,4 @@ const MentorIntro = require("../models/mentorIntro");
 //포스팅 글 삭제
 
 
-module.exports = { createMentorIntro, getMentorIntro };
-
-
+module.exports = { createMentorIntro, getMentorIntro }
