@@ -10,8 +10,8 @@ const createMentorUser = async (req, res) => {
       mentor_email,
       mentor_phone,
       mentor_nickname,
-      mentor_img,
-      mentor_paper_img,
+      mentor_img = null,
+      mentor_paper_img = null,
       mentor_company,
       mentor_category,
       mentor_position,
@@ -19,10 +19,25 @@ const createMentorUser = async (req, res) => {
       mentor_is_checked,
       mentor_social_login,
       mentor_gender,
-      mentor_warnning_count,
-      mentor_favorite_count,
-      mentor_suspension,
+      mentor_warnning_count = 0,
+      mentor_favorite_count = 0,
+      mentor_suspension = false,
     } = req.body;
+
+    const existingMentorById = Mentor.findOne({ mentor_id });
+    const existingMentorByEmail = Mentor.findOne({ mentor_email });
+
+    if (existingMentorById) {
+      return res.status(400).json({
+        error: "이 ID는 이미 사용중입니다. 다른 ID를 선택해주세요.",
+      });
+    }
+
+    if (existingMentorByEmail) {
+      return res.status(400).json({
+        error: "이 이메일은 이미 사용 중입니다. 다른 이메일을 선택해주세요.",
+      });
+    }
 
     const newMentor = new Mentor({
       mentor_id,
@@ -39,9 +54,9 @@ const createMentorUser = async (req, res) => {
       mentor_is_checked,
       mentor_social_login,
       mentor_gender,
-      mentor_warnning_count: mentor_warnning_count || 0, // 기본값 설정
-      mentor_favorite_count: mentor_favorite_count || 0, // 기본값 설정
-      mentor_suspension: mentor_suspension || false,
+      mentor_warnning_count,
+      mentor_favorite_count,
+      mentor_suspension,
     });
 
     const savedMentor = await newMentor.save();
@@ -76,12 +91,12 @@ const getAllMentorUser = async (req, res) => {
 // 특정 멘토 id로 조회하기
 const getMentorUserById = async (req, res) => {
   try {
-    const { id } = req.params;
-    const user = await Mentor.findById(id);
+    const { mentor_id } = req.params;
+    const user = await Mentor.findById(mentor_id);
     if (!user) {
       return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
     }
-    res.json(user);
+    res.status(200).json(user);
   } catch (error) {
     console.error("유저 조회 실패 : ", error);
     res.status(500).json({ error: "유저를 조회하는 도중 오류가 발생했습니다." });
@@ -91,10 +106,10 @@ const getMentorUserById = async (req, res) => {
 // 특정 id로 유저 데이터 수정
 const updateMentorUser = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { mentor_id } = req.params;
     const { mentor_img, mentor_nickname, mentor_company, mentor_category, mentor_position } = req.body;
 
-    const user = await Mentor.findById(id);
+    const user = await Mentor.findById(mentor_id);
 
     if (!user) {
       return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
@@ -117,8 +132,8 @@ const updateMentorUser = async (req, res) => {
 // 특정 id로 유저 데이터 삭제
 const deleteMentorUser = async (req, res) => {
   try {
-    const { id } = req.params;
-    const deleteduser = await Mentor.findByIdAndDelete(id);
+    const { mentor_id } = req.params;
+    const deleteduser = await Mentor.findByIdAndDelete(mentor_id);
 
     if (!deleteduser) {
       return res.status(404).json({ message: "특정 유저를 삭제할 수 없습니다." });
