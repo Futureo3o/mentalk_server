@@ -67,16 +67,28 @@ const createMenteeUser = async (req, res) => {
 const getAllMenteeUser = async (req, res) => {
   try {
     const mentee = await Mentee.find();
-
-    if (!mentee) {
-      return res.status(404).json({
-        error: "멘티 유저 정보를 실패했습니다.",
-      });
-    }
-
     res.status(200).json(mentee);
   } catch (error) {
     console.error("멘티 조회 요청 실패 : ", error);
     res.status;
+  }
+};
+
+//특정 멘티 id로 조회하기
+const getMenteeUserById = async (req, res) => {
+  try {
+    const { mentee_id } = req.body;
+    const user = await Mentee.findById(mentee_id);
+
+    if (!user) {
+      return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("특정 멘티 유저 조회 실패 : ", error);
+    res.status(500).json({
+      error: "유저를 조회하는 도중 오류가 발생했습니다.",
+    });
   }
 };
