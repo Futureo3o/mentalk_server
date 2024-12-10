@@ -24,8 +24,8 @@ const createMentorUser = async (req, res) => {
       mentor_suspension = false,
     } = req.body;
 
-    const existingMentorById = Mentor.findOne({ mentor_id });
-    const existingMentorByEmail = Mentor.findOne({ mentor_email });
+    const existingMentorById = await Mentor.findOne({ mentor_id: mentor_id });
+    const existingMentorByEmail = await Mentor.findOne({ mentor_email: mentor_email });
 
     if (existingMentorById) {
       return res.status(400).json({
@@ -92,7 +92,7 @@ const getAllMentorUser = async (req, res) => {
 const getMentorUserById = async (req, res) => {
   try {
     const { mentor_id } = req.params;
-    const user = await Mentor.findById(mentor_id);
+    const user = await Mentor.findOne({ mentor_id: mentor_id });
     if (!user) {
       return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
     }
@@ -109,7 +109,7 @@ const updateMentorUser = async (req, res) => {
     const { mentor_id } = req.params;
     const { mentor_img, mentor_nickname, mentor_company, mentor_category, mentor_position } = req.body;
 
-    const user = await Mentor.findById(mentor_id);
+    const user = await Mentor.findOne({ mentor_id: mentor_id });
 
     if (!user) {
       return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
@@ -129,15 +129,17 @@ const updateMentorUser = async (req, res) => {
   }
 };
 
-// 특정 id로 유저 데이터 삭제
+// 특정 id로 유저 데이터 삭제.
 const deleteMentorUser = async (req, res) => {
   try {
     const { mentor_id } = req.params;
-    const deleteduser = await Mentor.findByIdAndDelete(mentor_id);
+    const deleteduser = await Mentor.findOne({ mentor_id: mentor_id });
 
     if (!deleteduser) {
       return res.status(404).json({ message: "특정 유저를 삭제할 수 없습니다." });
     }
+
+    await Mentor.deleteOne({ mentor_id: mentor_id });
 
     res.status(200).json({
       message: "멘토 유저가 성공적으로 삭제되었습니다.",
