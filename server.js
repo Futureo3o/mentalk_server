@@ -18,6 +18,7 @@ const menteeRouter = require("./routes/menteeRouter.js");
 const signupMentorRouter = require("./routes/signupMentorRouter.js");
 const signupMenteeRouter = require("./routes/signupMenteeRouter.js");
 const loginMentorRouter = require("./routes/loginMentorRouter.js");
+const loginMenteeRouter = require("./routes/loginMenteeRouter.js");
 const cookieParser = require("cookie-parser");
 
 const app = express();
@@ -53,6 +54,8 @@ app.use("/login/mentor/accesstoken", loginMentorRouter);
 app.use("/login/mentor/refreshtoken", loginMentorRouter);
 app.use("/login/mentor/success", loginMentorRouter);
 app.use("/logout/mentor", loginMentorRouter);
+
+app.use("/login/mentee", loginMenteeRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(`${process.env.PORT}번 포트에서 서버가 실행 중...`);

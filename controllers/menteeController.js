@@ -1,4 +1,6 @@
 const Mentee = require("../models/mentee");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 //멘티 유저 생성
 const createMenteeUser = async (req, res) => {
@@ -33,9 +35,11 @@ const createMenteeUser = async (req, res) => {
       });
     }
 
+    const hashedPassword = await bcrypt.hash(mentee_pw, 10);
+
     const newMentee = new Mentee({
       mentee_id,
-      mentee_pw,
+      mentee_pw: hashedPassword,
       mentee_email,
       mentee_phone,
       mentee_nickname,
@@ -67,7 +71,11 @@ const createMenteeUser = async (req, res) => {
 const getAllMenteeUser = async (req, res) => {
   try {
     const mentee = await Mentee.find();
-    res.status(200).json(mentee);
+    const filterMentee = mentee.map((mentee) => {
+      const { mentee_pw, ...rest } = mentee.toObject();
+      return rest;
+    });
+    res.status(200).json(filterMentee);
   } catch (error) {
     console.error("멘티 조회 요청 실패 : ", error);
     res.status;
@@ -84,7 +92,9 @@ const getMenteeUserById = async (req, res) => {
       return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
     }
 
-    res.status(200).json(user);
+    const { mentee_pw, ...userInfo } = user.toObject();
+
+    res.status(200).json(userInfo);
   } catch (error) {
     console.error("유저 조회 실패 : ", error);
     res.status(500).json({
@@ -138,4 +148,184 @@ const deleteMenteeUserById = async (req, res) => {
   }
 };
 
-module.exports = { createMenteeUser, getAllMenteeUser, getMenteeUserById, updateMenteeUserById, deleteMenteeUserById };
+const loginMenteeUser = async (req, res) => {
+  try {
+    const { mentee_id, mentee_pw } = req.body;
+
+    const user = await Mentee.findOne({ mentee_id: mentee_id });
+
+    if (!user) {
+      return res.status(404).json({ error: "멘티 아이디가 존재하지 않거나 잘못 입력하셨습니다." });
+    }
+
+    const isMatch = await bcrypt.compare(mentee_pw, user.mentee_pw);
+
+    if (!isMatch) {
+      return res.status(401).json({ error: "비밀번호가 일치하지 않습니다." });
+    }
+
+    const accessToken = jwt.sign(
+      {
+        mentee_id: user.mentee_id,
+      },
+      process.env.MENTEE_ACCESS_SECRET,
+      {
+        expiresIn: "1h",
+        issuer: "About Tech",
+      }
+    );
+
+    const refreshToken = jwt.sign(
+      {
+        mentee_id: user.mentee_id,
+      },
+      process.env.MENTEE_REFRESH_SECRET,
+      {
+        expiresIn: "24h",
+        issuer: "About Tech",
+      }
+    );
+
+    res.cookie("accessToken", accessToken, {
+      secure: false,
+      httpOnly: true,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      secure: false,
+      httpOnly: true,
+    });
+
+    return res.status(200).json({ message: "로그인 성공", accessToken: accessToken, refreshToken: refreshToken });
+  } catch (error) {
+    console.error("멘티 로그인 실패 : ", error);
+    res.status(500).json({ error: "멘티 로그인 기능에 오류가 발생했습니다." });
+  }
+};
+
+const menteeAccessToken = async (req, res) => {
+  try {
+    const token = req.cookies.accessToken;
+
+    if (!token) {
+      return res.status(401).json({ error: "로그인이 필요합니다." });
+    }
+
+    const decoded = jwt.verify(token, process.env.MENTEE_ACCESS_SECRET);
+
+    const user = await Mentee.findOne({ mentee_id: decoded.mentee_id });
+
+    if (!user) {
+      return res.status(404).json({ error: "해당 멘토를 찾을 수 없습니다." });
+    }
+
+    res.status(200).json({
+      message: "멘티 정보 조회 성공",
+      data: {
+        mentee_id: user.mentee_id,
+        mentee_nickname: user.mentee_nickname,
+        mentee_email: user.mentee_email,
+        mentee_phone: user.mentee_phone,
+        mentee_position: user.mentee_position,
+        mentee_img: user.mentee_img,
+      },
+    });
+  } catch (error) {
+    console.error("엑세스 토큰 검증 실패 : ", error);
+    res.status(500).json({
+      error: "엑세스 토큰 검증 중 오류가 발생했습니다.",
+      details: error.message,
+    });
+  }
+};
+
+const menteeRefreshToken = async (req, res) => {
+  try {
+    const token = req.cookies.refreshToken;
+
+    if (!token) {
+      return res.status(401).json({ error: "로그인이 필요합니다." });
+    }
+
+    const decoded = jwt.verify(token, process.env.MENTEE_REFRESH_SECRET);
+
+    const user = await Mentee.findOne({ mentee_id: decoded.mentee_id });
+
+    if (!user) {
+      return res.status(404).json({ error: "해당 멘토를 찾을 수 없습니다." });
+    }
+
+    //access Token 새로 발급
+    const newAccessToken = jwt.sign(
+      {
+        mentor_id: user.mentor_id,
+      },
+      process.env.MENTEE_ACCESS_SECRET,
+      {
+        expiresIn: "1h",
+        issuer: "About Tech",
+      }
+    );
+
+    res.cookie("accessToken", newAccessToken, {
+      secure: false,
+      httpOnly: true,
+    });
+
+    res.status(200).json({ message: "새로운 액세스 토큰이 발급되었습니다.", accessToken: newAccessToken });
+  } catch (error) {
+    console.error("리프레쉬 토큰 검증 실패 : ", error);
+    res.status(500).json({
+      error: "리프레쉬 토큰 검증 중 오류가 발생했습니다.",
+      details: error.message,
+    });
+  }
+};
+
+const menteeLoginSuccess = async (req, res) => {
+  try {
+    const token = req.cookies.accessToken;
+
+    if (!token) {
+      return res.status(401).json({ error: "로그인이 필요합니다." });
+    }
+
+    const decoded = jwt.verify(token, process.env.MENTEE_ACCESS_SECRET);
+
+    const user = await Mentee.findOne({ mentee_id: decoded.mentee_id });
+
+    if (!user) {
+      return res.status(404).json({ error: "아이디가 일치하지 않습니다." });
+    }
+
+    const { mentee_pw, ...userInfo } = user.toObject();
+
+    res.status(200).json(userInfo);
+  } catch (error) {
+    console.error("실패", error);
+    res.status(500).json({ error: "에러" });
+  }
+};
+
+const menteeLogout = (req, res) => {
+  try {
+    req.cookie("accessToken", "");
+    res.status(200).json({ message: "로그아웃 성공" });
+  } catch (error) {
+    console.error("로그아웃 실패");
+    res.status(500).json({ error: "로그아웃 실패했습니다." });
+  }
+};
+
+module.exports = {
+  loginMenteeUser,
+  menteeAccessToken,
+  menteeRefreshToken,
+  menteeLoginSuccess,
+  menteeLogout,
+  createMenteeUser,
+  getAllMenteeUser,
+  getMenteeUserById,
+  updateMenteeUserById,
+  deleteMenteeUserById,
+};
