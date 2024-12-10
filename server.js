@@ -18,11 +18,8 @@ const menteeRouter = require("./routes/menteeRouter.js");
 const signupMentorRouter = require("./routes/signupMentorRouter.js");
 const signupMenteeRouter = require("./routes/signupMenteeRouter.js");
 const loginMentorRouter = require("./routes/loginMentorRouter.js");
-<<<<<<< HEAD
 const loginMenteeRouter = require("./routes/loginMenteeRouter.js");
-=======
-const mentorIntroduceRouter =require('./routes/mentorIntroduceRouter.js');
->>>>>>> 3f682023bab690ee4b5a5f040144d018f1615382
+const mentorIntroduceRouter = require("./routes/mentorIntroduceRouter.js");
 const cookieParser = require("cookie-parser");
 
 const app = express();
@@ -47,7 +44,7 @@ app.use("/users", userRouter);
 //멘토 관련 라우터
 app.use("/signup/mentor", signupMentorRouter);
 app.use("/mentor", mentorRouter);
-app.use("/intro",mentorIntroduceRouter);
+app.use("/intro", mentorIntroduceRouter);
 
 //멘티 관련 라우터
 app.use("/signup/mentee", signupMenteeRouter);
