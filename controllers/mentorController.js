@@ -1,4 +1,7 @@
 const Mentor = require("../models/mentor");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const cookie = require("cookie-parser");
 
 //멘토 유저 생성
 const createMentorUser = async (req, res) => {
@@ -24,8 +27,8 @@ const createMentorUser = async (req, res) => {
       mentor_suspension = false,
     } = req.body;
 
-    const existingMentorById = Mentor.findOne({ mentor_id });
-    const existingMentorByEmail = Mentor.findOne({ mentor_email });
+    const existingMentorById = await Mentor.findOne({ mentor_id: mentor_id });
+    const existingMentorByEmail = await Mentor.findOne({ mentor_email: mentor_email });
 
     if (existingMentorById) {
       return res.status(400).json({
@@ -39,9 +42,11 @@ const createMentorUser = async (req, res) => {
       });
     }
 
+    const hashedPassword = await bcrypt.hash(mentor_pw, 10);
+
     const newMentor = new Mentor({
       mentor_id,
-      mentor_pw,
+      mentor_pw: hashedPassword,
       mentor_email,
       mentor_phone,
       mentor_nickname,
@@ -78,7 +83,13 @@ const createMentorUser = async (req, res) => {
 const getAllMentorUser = async (req, res) => {
   try {
     const mentors = await Mentor.find();
-    res.status(200).json(mentors);
+
+    const filterMentors = mentors.map((mentor) => {
+      const { mentor_pw, ...rest } = mentor.toObject();
+      return rest;
+    });
+
+    res.status(200).json(filterMentors);
   } catch (error) {
     console.error("멘토 조회 요청 실패 : ", error);
     res.status(500).json({
@@ -92,7 +103,7 @@ const getAllMentorUser = async (req, res) => {
 const getMentorUserById = async (req, res) => {
   try {
     const { mentor_id } = req.params;
-    const user = await Mentor.findById(mentor_id);
+    const user = await Mentor.findOne({ mentor_id: mentor_id });
     if (!user) {
       return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
     }
@@ -109,7 +120,7 @@ const updateMentorUser = async (req, res) => {
     const { mentor_id } = req.params;
     const { mentor_img, mentor_nickname, mentor_company, mentor_category, mentor_position } = req.body;
 
-    const user = await Mentor.findById(mentor_id);
+    const user = await Mentor.findOne({ mentor_id: mentor_id });
 
     if (!user) {
       return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
@@ -129,15 +140,17 @@ const updateMentorUser = async (req, res) => {
   }
 };
 
-// 특정 id로 유저 데이터 삭제
+// 특정 id로 유저 데이터 삭제.
 const deleteMentorUser = async (req, res) => {
   try {
     const { mentor_id } = req.params;
-    const deleteduser = await Mentor.findByIdAndDelete(mentor_id);
+    const deleteduser = await Mentor.findOne({ mentor_id: mentor_id });
 
     if (!deleteduser) {
       return res.status(404).json({ message: "특정 유저를 삭제할 수 없습니다." });
     }
+
+    await Mentor.deleteOne({ mentor_id: mentor_id });
 
     res.status(200).json({
       message: "멘토 유저가 성공적으로 삭제되었습니다.",
@@ -149,4 +162,165 @@ const deleteMentorUser = async (req, res) => {
   }
 };
 
-module.exports = { createMentorUser, getAllMentorUser, getMentorUserById, updateMentorUser, deleteMentorUser };
+// 멘토 로그인 설정 코드
+const loginMentorUser = async (req, res) => {
+  try {
+    const { mentor_id, mentor_pw } = req.body;
+
+    const user = await Mentor.findOne({ mentor_id: mentor_id });
+    if (!user) {
+      return res.status(404).json({ error: "멘토 아이디가 존재하지 않거나 잘못 입력하셨습니다." });
+    }
+
+    const isMatch = await bcrypt.compare(mentor_pw, user.mentor_pw);
+
+    if (!isMatch) {
+      return res.status(401).json({ error: "비밀번호가 일치하지 않습니다." });
+    }
+
+    //JWT 발급
+    const accessToken = jwt.sign(
+      {
+        mentor_id: user.mentor_id,
+      },
+      process.env.MENTOR_ACCESS_SECRET,
+      {
+        expiresIn: "1h",
+        issuer: "About Tech",
+      }
+    );
+
+    const refreshToken = jwt.sign(
+      {
+        mentor_id: user.mentor_id,
+      },
+      process.env.MENTOR_REFRESH_SECRET,
+      {
+        expiresIn: "24h",
+        issuer: "About Tech",
+      }
+    );
+
+    res.cookie("accessToken", accessToken, {
+      secure: false,
+      httpOnly: true,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      secure: false,
+      httpOnly: true,
+    });
+
+    return res.status(200).json({ message: "로그인 성공", accessToken: accessToken, refreshToken: refreshToken });
+  } catch (error) {
+    console.error("로그인 기능 실패 : ", error);
+    res.status(500).json({ error: "로그인 기능이 실패하였습니다. 서버 오류" });
+  }
+};
+
+const accessToken = async (req, res) => {
+  try {
+    const token = req.cookies.accessToken;
+
+    if (!token) {
+      return res.status(401).json({ error: "로그인이 필요합니다." });
+    }
+
+    const decoded = jwt.verify(token, process.env.MENTOR_ACCESS_SECRET);
+
+    const user = await Mentor.findOne({ mentor_id: decoded.mentor_id });
+
+    if (!user) {
+      return res.status(404).json({ error: "해당 멘토를 찾을 수 없습니다." });
+    }
+
+    res.status(200).json({
+      message: "멘토 정보 조회 성공",
+      data: {
+        mentor_id: user.mentor_id,
+        mentor_nickname: user.mentor_nickname,
+        mentor_email: user.mentor_email,
+        mentor_phone: user.mentor_phone,
+        mentor_company: user.mentor_company,
+        mentor_category: user.mentor_category,
+        mentor_position: user.mentor_position,
+        mentor_career: user.mentor_career,
+        mentor_img: user.mentor_img,
+      },
+    });
+  } catch (error) {
+    console.error("엑세스 토큰 검증 실패 : ", error);
+    res.status(500).json({
+      error: "엑세스 토큰 검증 중 오류가 발생했습니다.",
+      details: error.message,
+    });
+  }
+};
+
+const refreshToken = async (req, res) => {
+  try {
+    const token = req.cookies.refreshToken;
+
+    if (!token) {
+      return res.status(401).json({ error: "로그인이 필요합니다." });
+    }
+
+    const decoded = jwt.verify(token, process.env.MENTOR_REFRESH_SECRET);
+
+    const user = await Mentor.findOne({ mentor_id: decoded.mentor_id });
+
+    if (!user) {
+      return res.status(404).json({ error: "해당 멘토를 찾을 수 없습니다." });
+    }
+
+    //access Token 새로 발급
+    const newAccessToken = jwt.sign(
+      {
+        mentor_id: user.mentor_id,
+      },
+      process.env.MENTOR_ACCESS_SECRET,
+      {
+        expiresIn: "1h",
+        issuer: "About Tech",
+      }
+    );
+
+    res.cookie("accessToken", newAccessToken, {
+      secure: false,
+      httpOnly: true,
+    });
+
+    res.status(200).json({ message: "새로운 액세스 토큰이 발급되었습니다.", accessToken: newAccessToken });
+  } catch (error) {
+    console.error("리프레쉬 토큰 검증 실패 : ", error);
+    res.status(500).json({
+      error: "리프레쉬 토큰 검증 중 오류가 발생했습니다.",
+      details: error.message,
+    });
+  }
+};
+
+const mentorLoginSuccess = (req, res) => {};
+
+const mentorLogout = (req, res) => {
+  try {
+    req.cookie("accessToken", "");
+    res.status(200).json({ message: "로그아웃 성공" });
+  } catch (error) {
+    console.error("로그아웃 실패");
+    res.status(500).json({ error: "로그아웃 실패했습니다." });
+  }
+};
+
+module.exports = {
+  accessToken,
+  refreshToken,
+  mentorLoginSuccess,
+  mentorLogout,
+  createMentorUser,
+  getAllMentorUser,
+  getMentorUserById,
+  updateMentorUser,
+  deleteMentorUser,
+  loginMentorUser,
+};
