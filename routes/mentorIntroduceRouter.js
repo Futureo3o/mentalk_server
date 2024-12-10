@@ -6,6 +6,4 @@ const router = express.Router();
 
 router.get("/:mentor_id", mentorIntroduceController.getMentorIntroduce)
 
-router.post("/", mentorIntroduceController.createUser)
-
 module.exports = router;
