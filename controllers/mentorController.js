@@ -99,7 +99,9 @@ const getMentorUserById = async (req, res) => {
     res.status(200).json(user);
   } catch (error) {
     console.error("유저 조회 실패 : ", error);
-    res.status(500).json({ error: "유저를 조회하는 도중 오류가 발생했습니다." });
+    res
+      .status(500)
+      .json({ error: "유저를 조회하는 도중 오류가 발생했습니다." });
   }
 };
 
@@ -107,7 +109,13 @@ const getMentorUserById = async (req, res) => {
 const updateMentorUser = async (req, res) => {
   try {
     const { mentor_id } = req.params;
-    const { mentor_img, mentor_nickname, mentor_company, mentor_category, mentor_position } = req.body;
+    const {
+      mentor_img,
+      mentor_nickname,
+      mentor_company,
+      mentor_category,
+      mentor_position,
+    } = req.body;
 
     const user = await Mentor.findById(mentor_id);
 
@@ -125,7 +133,9 @@ const updateMentorUser = async (req, res) => {
     res.status(200).json({ message: "유저를 성공적으로 수정되었습니다." });
   } catch (error) {
     console.error("멘토 유저 수정 실패 : ", error);
-    res.status(500).json({ error: "유저를 업데이트하는 도중 오류가 발생했습니다." });
+    res
+      .status(500)
+      .json({ error: "유저를 업데이트하는 도중 오류가 발생했습니다." });
   }
 };
 
@@ -136,7 +146,9 @@ const deleteMentorUser = async (req, res) => {
     const deleteduser = await Mentor.findByIdAndDelete(mentor_id);
 
     if (!deleteduser) {
-      return res.status(404).json({ message: "특정 유저를 삭제할 수 없습니다." });
+      return res
+        .status(404)
+        .json({ message: "특정 유저를 삭제할 수 없습니다." });
     }
 
     res.status(200).json({
@@ -145,8 +157,16 @@ const deleteMentorUser = async (req, res) => {
     });
   } catch (error) {
     console.error("특정 유저 데이터 삭제 실패 : ", error);
-    res.status(500).json({ error: "특정 멘토 유저를 삭제하는 도중 오류가 발생했습니다." });
+    res
+      .status(500)
+      .json({ error: "특정 멘토 유저를 삭제하는 도중 오류가 발생했습니다." });
   }
 };
 
-module.exports = { createMentorUser, getAllMentorUser, getMentorUserById, updateMentorUser, deleteMentorUser };
+module.exports = {
+  createMentorUser,
+  getAllMentorUser,
+  getMentorUserById,
+  updateMentorUser,
+  deleteMentorUser,
+};
