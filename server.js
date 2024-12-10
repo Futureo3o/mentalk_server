@@ -4,6 +4,7 @@
 // npm i mongodb  --save
 // npm i mongoose
 // npm i dotenv
+// npm i bcrypt
 
 const express = require("express");
 const connectDB = require("./config/db.js");
@@ -14,6 +15,7 @@ const mentorRouter = require("./routes/mentorRouter.js");
 const menteeRouter = require("./routes/menteeRouter.js");
 const signupMentorRouter = require("./routes/signupMentorRouter.js");
 const signupMenteeRouter = require("./routes/signupMenteeRouter.js");
+const loginMentorRouter = require("./routes/loginMentorRouter.js");
 
 const app = express();
 
@@ -35,6 +37,7 @@ app.use("/users", userRouter);
 
 //멘토 관련 라우터
 app.use("/signup/mentor", signupMentorRouter);
+app.use("/login/mentor", loginMentorRouter);
 app.use("/mentor", mentorRouter);
 
 //멘티 관련 라우터
