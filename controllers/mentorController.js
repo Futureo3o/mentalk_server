@@ -211,7 +211,7 @@ const loginMentorUser = async (req, res) => {
       httpOnly: true,
     });
 
-    return res.status(200).json({ message: "로그인 성공" });
+    return res.status(200).json({ message: "로그인 성공", accessToken: accessToken, refreshToken: refreshToken });
   } catch (error) {
     console.error("로그인 기능 실패 : ", error);
     res.status(500).json({ error: "로그인 기능이 실패하였습니다. 서버 오류" });
@@ -233,14 +233,84 @@ const accessToken = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "해당 멘토를 찾을 수 없습니다." });
     }
-  } catch (error) {}
+
+    res.status(200).json({
+      message: "멘토 정보 조회 성공",
+      data: {
+        mentor_id: user.mentor_id,
+        mentor_nickname: user.mentor_nickname,
+        mentor_email: user.mentor_email,
+        mentor_phone: user.mentor_phone,
+        mentor_company: user.mentor_company,
+        mentor_category: user.mentor_category,
+        mentor_position: user.mentor_position,
+        mentor_career: user.mentor_career,
+        mentor_img: user.mentor_img,
+      },
+    });
+  } catch (error) {
+    console.error("엑세스 토큰 검증 실패 : ", error);
+    res.status(500).json({
+      error: "엑세스 토큰 검증 중 오류가 발생했습니다.",
+      details: error.message,
+    });
+  }
 };
 
-const refreshToken = (req, res) => {};
+const refreshToken = async (req, res) => {
+  try {
+    const token = req.cookies.refreshToken;
+
+    if (!token) {
+      return res.status(401).json({ error: "로그인이 필요합니다." });
+    }
+
+    const decoded = jwt.verify(token, process.env.MENTOR_REFRESH_SECRET);
+
+    const user = await Mentor.findOne({ mentor_id: decoded.mentor_id });
+
+    if (!user) {
+      return res.status(404).json({ error: "해당 멘토를 찾을 수 없습니다." });
+    }
+
+    //access Token 새로 발급
+    const newAccessToken = jwt.sign(
+      {
+        mentor_id: user.mentor_id,
+      },
+      process.env.MENTOR_ACCESS_SECRET,
+      {
+        expiresIn: "1h",
+        issuer: "About Tech",
+      }
+    );
+
+    res.cookie("accessToken", newAccessToken, {
+      secure: false,
+      httpOnly: true,
+    });
+
+    res.status(200).json({ message: "새로운 액세스 토큰이 발급되었습니다.", accessToken: newAccessToken });
+  } catch (error) {
+    console.error("리프레쉬 토큰 검증 실패 : ", error);
+    res.status(500).json({
+      error: "리프레쉬 토큰 검증 중 오류가 발생했습니다.",
+      details: error.message,
+    });
+  }
+};
 
 const mentorLoginSuccess = (req, res) => {};
 
-const mentorLogout = (req, res) => {};
+const mentorLogout = (req, res) => {
+  try {
+    req.cookie("accessToken", "");
+    res.status(200).json({ message: "로그아웃 성공" });
+  } catch (error) {
+    console.error("로그아웃 실패");
+    res.status(500).json({ error: "로그아웃 실패했습니다." });
+  }
+};
 
 module.exports = {
   accessToken,
