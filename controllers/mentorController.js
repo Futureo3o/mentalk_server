@@ -129,7 +129,7 @@ const updateMentorUser = async (req, res) => {
   }
 };
 
-// 특정 id로 유저 데이터 삭제
+// 특정 id로 유저 데이터 삭제.
 const deleteMentorUser = async (req, res) => {
   try {
     const { mentor_id } = req.params;
