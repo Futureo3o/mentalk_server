@@ -7,7 +7,7 @@ const menteeSchema = new mongoose.Schema(
     mentee_email: { type: String, required: true },
     mentee_phone: { type: Number, required: true },
     mentee_nickname: { type: String, required: true },
-    mentee_position: { type: String, required: true },
+    mentee_position: { type: [String], required: true },
     mentee_img: { type: String, default: null },
     mentee_social_login: { type: Boolean, default: false },
     mentee_gender: { type: String, required: true },
