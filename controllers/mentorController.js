@@ -85,7 +85,7 @@ const getAllMentorUser = async (req, res) => {
     const mentors = await Mentor.find();
 
     const filterMentors = mentors.map((mentor) => {
-      const { mentor_pw, ...rest } = mentor;
+      const { mentor_pw, ...rest } = mentor.toObject();
       return rest;
     });
 
