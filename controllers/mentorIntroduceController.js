@@ -26,4 +26,4 @@ const MentorIntroduce = require("../models/mentorIntroduce");
     };
 
 
-module.exports = { getMentorIntroduce, createUser };
+module.exports = { getMentorIntroduce };
