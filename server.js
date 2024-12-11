@@ -22,7 +22,6 @@ const loginMenteeRouter = require("./routes/loginMenteeRouter.js");
 const logoutMentorRouter = require("./routes/logoutMentorRouter.js");
 const logoutMenteeRouter = require("./routes/logoutMenteeRouter.js");
 const mentorIntroduceRouter = require("./routes/mentorIntroduceRouter.js");
-const mentorIntroduceRouter =require('./routes/mentorIntroduceRouter.js');
 const reviewRouter=require('./routes/reviewRouter.js');
 const cookieParser = require("cookie-parser");
 
