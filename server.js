@@ -23,7 +23,7 @@ const logoutMentorRouter = require("./routes/logoutMentorRouter.js");
 const logoutMenteeRouter = require("./routes/logoutMenteeRouter.js");
 const mentorIntroduceRouter = require("./routes/mentorIntroduceRouter.js");
 const coffeeChatRouter = require("./routes/coffeeChatRouter.js");
-const mentorIntroduceRouter = require("./routes/mentorIntroduceRouter.js");
+
 const reviewRouter = require("./routes/reviewRouter.js");
 const cookieParser = require("cookie-parser");
 
@@ -51,7 +51,7 @@ app.use("/signup/mentor", signupMentorRouter);
 app.use("/mentor", mentorRouter);
 app.use("/introduce", mentorIntroduceRouter);
 
-//멘티 관련 라우터
+//멘티 관련 라우터.
 app.use("/signup/mentee", signupMenteeRouter);
 app.use("/mentee", menteeRouter);
 
