@@ -1,7 +1,6 @@
 const Mentor = require("../models/mentor");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const cookie = require("cookie-parser");
 
 //멘토 유저 생성
 const createMentorUser = async (req, res) => {
@@ -65,7 +64,6 @@ const createMentorUser = async (req, res) => {
     });
 
     const savedMentor = await newMentor.save();
-
     res.status(201).json({
       message: "멘토 유저가 성공적으로 생성되었습니다.",
       data: savedMentor,
@@ -107,7 +105,10 @@ const getMentorUserById = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
     }
-    res.status(200).json(user);
+
+    const { mentor_pw, ...userInfo } = user.toObject();
+
+    res.status(200).json(userInfo);
   } catch (error) {
     console.error("유저 조회 실패 : ", error);
     res.status(500).json({ error: "유저를 조회하는 도중 오류가 발생했습니다." });
@@ -211,14 +212,15 @@ const loginMentorUser = async (req, res) => {
       httpOnly: true,
     });
 
-    return res.status(200).json({ message: "로그인 성공", accessToken: accessToken, refreshToken: refreshToken });
+    return res.status(200).json({ message: "로그인 성공", data: user, accessToken: accessToken, refreshToken: refreshToken });
   } catch (error) {
     console.error("로그인 기능 실패 : ", error);
     res.status(500).json({ error: "로그인 기능이 실패하였습니다. 서버 오류" });
   }
 };
 
-const accessToken = async (req, res) => {
+// accessToken: 엑세스 토큰 검증 및 멘토 정보 조회
+const mentorAccessToken = async (req, res) => {
   try {
     const token = req.cookies.accessToken;
 
@@ -257,7 +259,8 @@ const accessToken = async (req, res) => {
   }
 };
 
-const refreshToken = async (req, res) => {
+// refreshToken: 리프레시 토큰을 이용해 새로운 액세스 토큰 발급
+const mentorRefreshToken = async (req, res) => {
   try {
     const token = req.cookies.refreshToken;
 
@@ -300,8 +303,33 @@ const refreshToken = async (req, res) => {
   }
 };
 
-const mentorLoginSuccess = (req, res) => {};
+// mentorLoginSuccess: 로그인 후 멘토 정보 반환 (비밀번호 제외)
+const mentorLoginSuccess = async (req, res) => {
+  try {
+    const token = req.cookies.accessToken;
 
+    if (!token) {
+      return res.status(401).json({ error: "로그인이 필요합니다." });
+    }
+
+    const decoded = jwt.verify(token, process.env.MENTOR_ACCESS_SECRET);
+
+    const user = await Mentor.findOne({ mentor_id: decoded.mentor_id });
+
+    if (!user) {
+      return res.status(404).json({ error: "아이디가 일치하지 않습니다." });
+    }
+
+    const { mentor_pw, ...userInfo } = user.toObject();
+
+    res.status(200).json(userInfo);
+  } catch (error) {
+    console.error("실패", error);
+    res.status(500).json({ error: "에러" });
+  }
+};
+
+// mentorLogout: 로그아웃 처리 (액세스 토큰 제거)
 const mentorLogout = (req, res) => {
   try {
     req.cookie("accessToken", "");
@@ -313,8 +341,8 @@ const mentorLogout = (req, res) => {
 };
 
 module.exports = {
-  accessToken,
-  refreshToken,
+  mentorAccessToken,
+  mentorRefreshToken,
   mentorLoginSuccess,
   mentorLogout,
   createMentorUser,

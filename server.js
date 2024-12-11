@@ -18,6 +18,10 @@ const menteeRouter = require("./routes/menteeRouter.js");
 const signupMentorRouter = require("./routes/signupMentorRouter.js");
 const signupMenteeRouter = require("./routes/signupMenteeRouter.js");
 const loginMentorRouter = require("./routes/loginMentorRouter.js");
+const loginMenteeRouter = require("./routes/loginMenteeRouter.js");
+const logoutMentorRouter = require("./routes/logoutMentorRouter.js");
+const logoutMenteeRouter = require("./routes/logoutMenteeRouter.js");
+const mentorIntroduceRouter = require("./routes/mentorIntroduceRouter.js");
 const mentorIntroduceRouter =require('./routes/mentorIntroduceRouter.js');
 const reviewRouter=require('./routes/reviewRouter.js');
 const cookieParser = require("cookie-parser");
@@ -52,14 +56,14 @@ app.use("/mentee", menteeRouter);
 
 //로그인 관련 라우터
 app.use("/login/mentor", loginMentorRouter);
-app.use("/login/mentor/accesstoken", loginMentorRouter);
-app.use("/login/mentor/refreshtoken", loginMentorRouter);
-app.use("/login/mentor/success", loginMentorRouter);
-app.use("/logout/mentor", loginMentorRouter);
+app.use("/login/mentee", loginMenteeRouter);
 
-//리뷰 관련 라우터
-app.use("/review",reviewRouter);
+//로그아웃 관련 라우터
+app.use("/logout/mentor", logoutMentorRouter);
+app.use("/logout/mentee", logoutMenteeRouter);
 
+//멘토 북마크 관련 라우터
+app.use("/intro", mentorIntroduceRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(`${process.env.PORT}번 포트에서 서버가 실행 중...`);
