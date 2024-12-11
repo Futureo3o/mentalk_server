@@ -13,12 +13,7 @@ const MentorIntroduce = require("../models/mentorIntroduce");
             }
 
             res.json({
-                mentor_id: mentor_intro.mentor_id,
-                mentor_title: mentor_intro.mentor_title,
-                mentor_content: mentor_intro.mentor_content,
-                review_count : mentor_intro.review_count,
-                coffeechat_count:mentor_intro.coffeechat_count,
-                 mentor_rating:mentor_intro.mentor_rating,
+               mentor_intro:mentor_intro
         });
         }catch(error){
             res.status(500).json({error:"멘토포스팅 조회 중 오류가 발생했습니다."});
