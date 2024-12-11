@@ -51,7 +51,7 @@ app.use("/signup/mentor", signupMentorRouter);
 app.use("/mentor", mentorRouter);
 app.use("/introduce", mentorIntroduceRouter);
 
-//멘티 관련 라우터
+//멘티 관련 라우터.
 app.use("/signup/mentee", signupMenteeRouter);
 app.use("/mentee", menteeRouter);
 
