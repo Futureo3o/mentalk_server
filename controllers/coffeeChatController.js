@@ -23,7 +23,7 @@ const createCoffeeChat = async (req, res) => {
 
     const saveNewCoffeeChat = await newCoffeeChat.save();
     res.status(201).json({
-      message: "멘토 유저가 성공적으로 생성되었습니다.",
+      message: "멘토 유저가 성공적으로 생성되었습니다..",
       data: saveNewCoffeeChat,
     });
   } catch (error) {
@@ -35,4 +35,15 @@ const createCoffeeChat = async (req, res) => {
   }
 };
 
-module.exports = { createCoffeeChat };
+//커피챗 조회
+const getAllCoffeeChat = async (req, res) => {
+  try {
+    const data = await CoffeeChat.find();
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("커피챗 조회 실패 : ", error);
+    res.status(500).json({ error: "커피챗 조회 기능 도중 에러가 발생했습니다." });
+  }
+};
+
+module.exports = { createCoffeeChat, getAllCoffeeChat };
