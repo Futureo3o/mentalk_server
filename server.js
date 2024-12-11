@@ -21,8 +21,9 @@ const loginMentorRouter = require("./routes/loginMentorRouter.js");
 const loginMenteeRouter = require("./routes/loginMenteeRouter.js");
 const logoutMentorRouter = require("./routes/logoutMentorRouter.js");
 const logoutMenteeRouter = require("./routes/logoutMenteeRouter.js");
+const coffeeChatRouter = require("./routes/coffeeChatRouter.js");
 const mentorIntroduceRouter = require("./routes/mentorIntroduceRouter.js");
-const reviewRouter=require('./routes/reviewRouter.js');
+const reviewRouter = require("./routes/reviewRouter.js");
 const cookieParser = require("cookie-parser");
 
 const app = express();
@@ -47,7 +48,7 @@ app.use("/users", userRouter);
 //멘토 관련 라우터
 app.use("/signup/mentor", signupMentorRouter);
 app.use("/mentor", mentorRouter);
-app.use("/introduce",mentorIntroduceRouter);
+app.use("/introduce", mentorIntroduceRouter);
 
 //멘티 관련 라우터
 app.use("/signup/mentee", signupMenteeRouter);
@@ -66,6 +67,9 @@ app.use("/review",reviewRouter);
 
 //멘토 북마크 관련 라우터
 app.use("/intro", mentorIntroduceRouter);
+
+//커피챗 관련 라우터
+app.use("/coffeechat", coffeeChatRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(`${process.env.PORT}번 포트에서 서버가 실행 중...`);
