@@ -36,7 +36,7 @@ const getReview_mentee_All =async (req,res) =>{
 
     try{
         const reviews =await Review.find({mentee_id},
-            {  _id: 0,review_content: 1, review_rating: 1 }
+            {  _id: 0,coffeechat_id:1,review_content: 1, review_rating: 1 }
         );
 
         if(reviews.length===0){
@@ -94,6 +94,7 @@ const getReview =async(req,res)=>{
         });
     }
     res.json({
+        coffeechat_id:mentee_review.coffeechat_id,
         mentee_id:mentee_review.mentee_id,
         review_content: mentee_review.review_content,
         review_rating:mentee_review.review_rating,
