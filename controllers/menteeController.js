@@ -139,7 +139,7 @@ const deleteMenteeUserById = async (req, res) => {
     await Mentee.deleteOne({ mentee_id });
 
     res.status(200).json({
-      message: "멘토 유저가 성공적으로 삭제되었습니다.",
+      message: "멘티 유저가 성공적으로 삭제되었습니다.",
       data: deleteduser,
     });
   } catch (error) {
@@ -170,7 +170,7 @@ const loginMenteeUser = async (req, res) => {
       },
       process.env.MENTEE_ACCESS_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "2m",
         issuer: "About Tech",
       }
     );
@@ -188,12 +188,12 @@ const loginMenteeUser = async (req, res) => {
 
     res.cookie("accessToken", accessToken, {
       secure: false,
-      httpOnly: true,
+      httpOnly: false,
     });
 
     res.cookie("refreshToken", refreshToken, {
       secure: false,
-      httpOnly: true,
+      httpOnly: false,
     });
 
     return res.status(200).json({ message: "로그인 성공", accessToken: accessToken, refreshToken: refreshToken });
@@ -262,14 +262,14 @@ const menteeRefreshToken = async (req, res) => {
       },
       process.env.MENTEE_ACCESS_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "2m",
         issuer: "About Tech",
       }
     );
 
     res.cookie("accessToken", newAccessToken, {
       secure: false,
-      httpOnly: true,
+      httpOnly: false,
     });
 
     res.status(200).json({ message: "새로운 액세스 토큰이 발급되었습니다.", accessToken: newAccessToken });
