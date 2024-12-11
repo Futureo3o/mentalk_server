@@ -212,7 +212,7 @@ const loginMentorUser = async (req, res) => {
       httpOnly: true,
     });
 
-    return res.status(200).json({ message: "로그인 성공", accessToken: accessToken, refreshToken: refreshToken });
+    return res.status(200).json({ message: "로그인 성공", data: user, accessToken: accessToken, refreshToken: refreshToken });
   } catch (error) {
     console.error("로그인 기능 실패 : ", error);
     res.status(500).json({ error: "로그인 기능이 실패하였습니다. 서버 오류" });
