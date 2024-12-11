@@ -61,6 +61,9 @@ app.use("/login/mentee", loginMenteeRouter);
 app.use("/logout/mentor", logoutMentorRouter);
 app.use("/logout/mentee", logoutMenteeRouter);
 
+//리뷰 관련 라우터
+app.use("/review",reviewRouter);
+
 //멘토 북마크 관련 라우터
 app.use("/intro", mentorIntroduceRouter);
 
