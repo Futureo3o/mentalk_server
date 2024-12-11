@@ -56,7 +56,7 @@ const getReview_mentee_All =async (req,res) =>{
         });
     }
 };
-// 멘토 모든 리뷰 조회
+// 멘토 모든 리뷰 조회wnd
 
 //멘티 특정 리뷰 조회
 const getReview =async(req,res)=>{
