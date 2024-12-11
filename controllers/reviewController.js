@@ -57,7 +57,31 @@ const getReview_mentee_All =async (req,res) =>{
     }
 };
 // 멘토 모든 리뷰 조회wnd
+// const getReview_mentor_All =async (req,res) =>{
+//     const {mentor_id}= req.params;
 
+//     try{
+//         const reviews =await Review.find({mentor_id},
+//             {  _id: 0,review_content: 1, review_rating: 1 }
+//         );
+
+//         if(reviews.length===0){
+//             return res. status(404).json({
+//                 error:"리뷰가 없습니다",
+//                 message : "해당 멘토 아이디에 대한 리뷰가 존재하지 않습니다."
+//             });
+//         }
+//         return res.status(200).json({
+//             message:"리뷰 목록 리스트 성공",
+//             reviews: reviews ,
+//         });
+//     }catch(error){
+//         return res.status(500).json({
+//             error:'서버 오류',
+//             message:'리뷰 조회 중 문제가 발생했습니다.'
+//         });
+//     }
+// };
 //멘티 특정 리뷰 조회
 const getReview =async(req,res)=>{
     const {mentee_id,coffeechat_id}= req.params;
