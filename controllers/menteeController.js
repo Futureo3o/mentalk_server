@@ -120,7 +120,7 @@ const updateMenteeUserById = async (req, res) => {
     if (mentee_position) user.mentee_position = mentee_position;
 
     await user.save();
-    res.status(200).json({ message: "유저를 성공적으로 수정되었습니다." });
+    res.status(200).json({ message: "유저를 성공적으로 수정하였습니다." });
   } catch (error) {
     console.error("멘티 유저 정보 실패 : ", error);
     res.status(500).json({ error: "유저를 업데이트하는 도중 오류가 발생했습니다." });
@@ -139,7 +139,7 @@ const deleteMenteeUserById = async (req, res) => {
     await Mentee.deleteOne({ mentee_id });
 
     res.status(200).json({
-      message: "멘토 유저가 성공적으로 삭제되었습니다.",
+      message: "멘티 유저가 성공적으로 삭제되었습니다.",
       data: deleteduser,
     });
   } catch (error) {
@@ -170,7 +170,7 @@ const loginMenteeUser = async (req, res) => {
       },
       process.env.MENTEE_ACCESS_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "2m",
         issuer: "About Tech",
       }
     );
@@ -188,12 +188,12 @@ const loginMenteeUser = async (req, res) => {
 
     res.cookie("accessToken", accessToken, {
       secure: false,
-      httpOnly: true,
+      httpOnly: false,
     });
 
     res.cookie("refreshToken", refreshToken, {
       secure: false,
-      httpOnly: true,
+      httpOnly: false,
     });
 
     return res.status(200).json({ message: "로그인 성공", accessToken: accessToken, refreshToken: refreshToken });
@@ -255,21 +255,21 @@ const menteeRefreshToken = async (req, res) => {
       return res.status(404).json({ error: "해당 멘토를 찾을 수 없습니다." });
     }
 
-    //access Token 새로 발급
+    //access Token 새로 발급..
     const newAccessToken = jwt.sign(
       {
         mentor_id: user.mentor_id,
       },
       process.env.MENTEE_ACCESS_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "2m",
         issuer: "About Tech",
       }
     );
 
     res.cookie("accessToken", newAccessToken, {
       secure: false,
-      httpOnly: true,
+      httpOnly: false,
     });
 
     res.status(200).json({ message: "새로운 액세스 토큰이 발급되었습니다.", accessToken: newAccessToken });
