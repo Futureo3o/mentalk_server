@@ -23,7 +23,7 @@ const createCoffeeChat = async (req, res) => {
 
     const saveNewCoffeeChat = await newCoffeeChat.save();
     res.status(201).json({
-      message: "멘토 유저가 성공적으로 생성되었습니다.",
+      message: "멘토 유저가 성공적으로 생성되었습니다..",
       data: saveNewCoffeeChat,
     });
   } catch (error) {
