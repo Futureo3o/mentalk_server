@@ -120,7 +120,7 @@ const updateMentorUser = async (req, res) => {
   try {
     const { mentor_id } = req.params;
     const { mentor_img, mentor_nickname, mentor_company, mentor_category, mentor_position } = req.body;
-
+    const fixData = { mentor_img, mentor_nickname, mentor_company, mentor_category, mentor_position };
     const user = await Mentor.findOne({ mentor_id: mentor_id });
 
     if (!user) {
@@ -134,7 +134,7 @@ const updateMentorUser = async (req, res) => {
     if (mentor_position) user.mentor_position = mentor_position;
 
     await user.save();
-    res.status(200).json({ message: "유저를 성공적으로 수정되었습니다." });
+    res.status(200).json({ message: "유저를 성공적으로 수정하였습니다." });
   } catch (error) {
     console.error("멘토 유저 수정 실패 : ", error);
     res.status(500).json({ error: "유저를 업데이트하는 도중 오류가 발생했습니다." });
@@ -186,7 +186,7 @@ const loginMentorUser = async (req, res) => {
       },
       process.env.MENTOR_ACCESS_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "2m",
         issuer: "About Tech",
       }
     );
@@ -204,12 +204,12 @@ const loginMentorUser = async (req, res) => {
 
     res.cookie("accessToken", accessToken, {
       secure: false,
-      httpOnly: true,
+      httpOnly: false,
     });
 
     res.cookie("refreshToken", refreshToken, {
       secure: false,
-      httpOnly: true,
+      httpOnly: false,
     });
 
     return res.status(200).json({ message: "로그인 성공", data: user, accessToken: accessToken, refreshToken: refreshToken });
@@ -283,14 +283,14 @@ const mentorRefreshToken = async (req, res) => {
       },
       process.env.MENTOR_ACCESS_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "2m",
         issuer: "About Tech",
       }
     );
 
     res.cookie("accessToken", newAccessToken, {
       secure: false,
-      httpOnly: true,
+      httpOnly: false,
     });
 
     res.status(200).json({ message: "새로운 액세스 토큰이 발급되었습니다.", accessToken: newAccessToken });
