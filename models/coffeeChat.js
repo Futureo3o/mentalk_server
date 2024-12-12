@@ -7,6 +7,7 @@ const coffeeChatSchema = new mongoose.Schema(
       ref: "mentorIntroduce", // mentorIntroduce 컬렉션을 참조
       required: true,
     },
+    mentor_id: { type: String, required: true },
     mentee_id: { type: String, required: true },
     coffee_completed: { type: Date, default: null },
     coffee_status: { type: String, default: "신청" },
