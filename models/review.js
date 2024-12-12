@@ -4,13 +4,21 @@ const mongoose = require("mongoose");
 const reviewSchema = new mongoose.Schema(
     {
         //커피챗 구현 시 유니크 아이디
-      coffeechat_id :{type :String ,require:true},
-      mentee_id:{type: String , ref: "Mentee",required:true},
+      coffeechat_id :{type: mongoose.Schema.Types.ObjectId,
+        ref: "CoffeeChat", 
+        required: true,},
+      mentor_id:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Mentor",
+        required: true, 
+      },
+      mentee_id:{type:String ,ref:"Mentee",required:true},
+      mentee_nickname:{type:String,required:true},
       review_content:{type:String, required:true},
       review_rating:{type:Number,required:true,min:1,max:5},
     },
     { timestamps: true }
-  );
+  );      
   
 
 const review = mongoose.model("review", reviewSchema);

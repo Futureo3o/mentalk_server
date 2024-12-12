@@ -1,17 +1,31 @@
+const Mentee = require('../models/mentee');
 const Review = require("../models/review");
+
 
 //리뷰 작성
 const createReview = async(req,res)=>{
     const {review_content,review_rating,mentee_id,coffeechat_id}=req.body;
+    
     if(!review_content || !review_rating || !coffeechat_id || !mentee_id){
-        return res.status(400).json({error:"모든 내용을 채워주세요",
+        return res.status(400).json({
+            error:"모든 내용을 채워주세요",
             message:"커피챗 아이디, 멘티 아이디, 리뷰 내용, 리뷰 평점이 포함되어야합니다."
         });
     }
     try{
+        const mentee = await Mentee.findOne({mentee_id:mentee_id});
+        if(!mentee){
+            return res.status(404).json({
+                error: "멘티를 찾을 수 없습니다.",
+                message:"해당 멘티 ID에 해당하는 멘티가 존재하지 않습니다."
+            });
+        }
+        const mentee_nickname =mentee.mentee_nickname;
+
         const newReview =new Review({
             coffeechat_id,
             mentee_id,
+            mentee_nickname,
             review_content,
             review_rating,
         });
@@ -21,6 +35,7 @@ const createReview = async(req,res)=>{
             message:'리뷰 저장 완료',
             coffeechat_id :savedReview.coffeechat_id, 
             mentee_id: savedReview.mentee_id,
+            mentee_nickname:savedReview.mentee_nickname,
             review_content: savedReview.review_content,
             review_rating: savedReview.review_rating,
         
@@ -33,10 +48,9 @@ const createReview = async(req,res)=>{
 // 멘티 모든 리뷰 조회
 const getReview_mentee_All =async (req,res) =>{
     const {mentee_id}= req.params;
-
     try{
-        const reviews =await Review.find({mentee_id},
-            {  _id: 0,coffeechat_id:1,review_content: 1, review_rating: 1 }
+        const reviews =await Review.find({mentee_id}
+           
         );
 
         if(reviews.length===0){
@@ -57,31 +71,31 @@ const getReview_mentee_All =async (req,res) =>{
     }
 };
 // 멘토 모든 리뷰 조회wnd
-// const getReview_mentor_All =async (req,res) =>{
-//     const {mentor_id}= req.params;
+const getReview_mentor_All =async (req,res) =>{
+    const {coffeechat_id,mentor_id}= req.params;
+       
+    try{
+        const reviews =await Review.find({mentor_id,coffeechat_id},
+            {  _id: 0,coffeechat_id:1,review_content: 1, review_rating: 1 }
+        );
 
-//     try{
-//         const reviews =await Review.find({mentor_id},
-//             {  _id: 0,review_content: 1, review_rating: 1 }
-//         );
-
-//         if(reviews.length===0){
-//             return res. status(404).json({
-//                 error:"리뷰가 없습니다",
-//                 message : "해당 멘토 아이디에 대한 리뷰가 존재하지 않습니다."
-//             });
-//         }
-//         return res.status(200).json({
-//             message:"리뷰 목록 리스트 성공",
-//             reviews: reviews ,
-//         });
-//     }catch(error){
-//         return res.status(500).json({
-//             error:'서버 오류',
-//             message:'리뷰 조회 중 문제가 발생했습니다.'
-//         });
-//     }
-// };
+        if(reviews.length===0){
+            return res. status(404).json({
+                error:"리뷰가 없습니다",
+                message : "해당 멘토 아이디에 대한 리뷰가 존재하지 않습니다."
+            });
+        }
+        return res.status(200).json({
+            message:"리뷰 목록 리스트 성공",
+            reviews: reviews ,
+        });
+    }catch(error){
+        return res.status(500).json({
+            error:'서버 오류',
+            message:'리뷰 조회 중 문제가 발생했습니다.'
+        });
+    }
+};
 //멘티 특정 리뷰 조회
 const getReview =async(req,res)=>{
     const {mentee_id,coffeechat_id}= req.params;
@@ -94,10 +108,7 @@ const getReview =async(req,res)=>{
         });
     }
     res.json({
-        coffeechat_id:mentee_review.coffeechat_id,
-        mentee_id:mentee_review.mentee_id,
-        review_content: mentee_review.review_content,
-        review_rating:mentee_review.review_rating,
+       mentee_review:mentee_review
     });
    }catch(error){
         res.status(500).json({error:'리뷰 조회 중 오류가 발생했습니다.'});
@@ -170,4 +181,4 @@ const deleteReview =async(req,res)=>{
 }
 
 
-module.exports = { createReview, getReview, updateReview,deleteReview,getReview_mentee_All};
+module.exports = { createReview, getReview, updateReview,deleteReview,getReview_mentee_All,getReview_mentor_All};
