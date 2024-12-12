@@ -7,6 +7,8 @@
 // npm i bcrypt
 // npm i cookie-parser
 // npm i jsonwebtoken
+// npm i multer
+// npm i path
 
 const express = require("express");
 const connectDB = require("./config/db.js");
@@ -29,9 +31,10 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
-// JSON 바디 파서 미들웨어
+// 미들웨어
 app.use(express.json());
 app.use(cookieParser());
+app.use("./public", express.static("public"));
 
 // CORS 설정
 app.use(
@@ -64,7 +67,7 @@ app.use("/logout/mentor", logoutMentorRouter);
 app.use("/logout/mentee", logoutMenteeRouter);
 
 //리뷰 관련 라우터
-app.use("/review",reviewRouter);
+app.use("/review", reviewRouter);
 
 //멘토 북마크 관련 라우터
 app.use("/intro", mentorIntroduceRouter);
