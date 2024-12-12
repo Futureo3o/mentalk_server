@@ -1,18 +1,23 @@
 const CoffeeChat = require("../models/coffeeChat.js");
 const MentorIntroduce = require("../models/mentorIntroduce.js");
+const Mentor = require("../models/mentor.js");
+const Mentee = require("../models/mentee.js");
 
 //커피챗 생성
 const createCoffeeChat = async (req, res) => {
   try {
-    const { introduce_id, mentee_id, coffee_request, coffee_wanted } = req.body;
+    const { introduce_id, mentor_id, mentee_id, coffee_request, coffee_wanted } = req.body;
 
-    const mentor = await MentorIntroduce.findById(introduce_id);
-    if (!mentor) {
+    const mentorIntroduceId = await MentorIntroduce.findById(introduce_id);
+    if (!mentorIntroduceId) {
       return res.status(404).json({ error: "유효하지 않은 멘토 아이디입니다." });
     }
 
+    const mentor = await Mentor.findOne({ mentor_id: mentor_id });
+
     const newCoffeeChat = new CoffeeChat({
       introduce_id,
+      mentor_id,
       mentee_id,
       coffee_completed: null,
       coffee_status: "신청",
@@ -39,7 +44,7 @@ const createCoffeeChat = async (req, res) => {
 const getAllCoffeeChat = async (req, res) => {
   try {
     const data = await CoffeeChat.find();
-    res.status(200).json(data);
+    res.status(200).json({ message: "커피챗 조회 성공했습니다.", data: data });
   } catch (error) {
     console.error("커피챗 조회 실패 : ", error);
     res.status(500).json({ error: "커피챗 조회 기능 도중 에러가 발생했습니다." });

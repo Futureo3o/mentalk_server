@@ -251,6 +251,7 @@ const loginMentorUser = async (req, res) => {
 };
 
 // accessToken: 엑세스 토큰 검증 및 멘토 정보 조회
+// 엑세스 토큰 검증 및 멘토 정보 조회
 const mentorAccessToken = async (req, res) => {
   try {
     const token = req.cookies.accessToken;
@@ -259,28 +260,43 @@ const mentorAccessToken = async (req, res) => {
       return res.status(401).json({ error: "로그인이 필요합니다." });
     }
 
-    const decoded = jwt.verify(token, process.env.MENTOR_ACCESS_SECRET);
+    try {
+      const decoded = jwt.verify(token, process.env.MENTOR_ACCESS_SECRET);
+      const user = await Mentor.findOne({ mentor_id: decoded.mentor_id });
 
-    const user = await Mentor.findOne({ mentor_id: decoded.mentor_id });
+      if (!user) {
+        return res.status(404).json({ error: "해당 멘토를 찾을 수 없습니다." });
+      }
 
-    if (!user) {
-      return res.status(404).json({ error: "해당 멘토를 찾을 수 없습니다." });
+      res.status(200).json({
+        message: "멘토 정보 조회 성공",
+        data: {
+          mentor_id: user.mentor_id,
+          mentor_nickname: user.mentor_nickname,
+          mentor_email: user.mentor_email,
+          mentor_phone: user.mentor_phone,
+          mentor_company: user.mentor_company,
+          mentor_category: user.mentor_category,
+          mentor_position: user.mentor_position,
+          mentor_career: user.mentor_career,
+          mentor_paper_img: user.mentor_img,
+        },
+      });
+    } catch (err) {
+      // TokenExpiredError 처리
+      if (err.name === "TokenExpiredError") {
+        console.log("엑세스 토큰 만료");
+
+        // 리프레시 토큰으로 새로운 액세스 토큰을 발급하는 로직 추가
+        return res.status(401).json({ error: "엑세스 토큰이 만료되었습니다. 리프레시 토큰을 사용하여 새 토큰을 발급해주세요." });
+      }
+
+      console.error("엑세스 토큰 검증 실패 : ", err);
+      res.status(500).json({
+        error: "엑세스 토큰 검증 중 오류가 발생했습니다.",
+        details: err.message,
+      });
     }
-
-    res.status(200).json({
-      message: "멘토 정보 조회 성공",
-      data: {
-        mentor_id: user.mentor_id,
-        mentor_nickname: user.mentor_nickname,
-        mentor_email: user.mentor_email,
-        mentor_phone: user.mentor_phone,
-        mentor_company: user.mentor_company,
-        mentor_category: user.mentor_category,
-        mentor_position: user.mentor_position,
-        mentor_career: user.mentor_career,
-        mentor_paper_img: user.mentor_img,
-      },
-    });
   } catch (error) {
     console.error("엑세스 토큰 검증 실패 : ", error);
     res.status(500).json({

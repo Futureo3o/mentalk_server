@@ -9,6 +9,7 @@
 // npm i jsonwebtoken
 // npm i multer
 // npm i path
+// npm install swagger-jsdoc swagger-ui-express
 
 const express = require("express");
 const connectDB = require("./config/db.js");
