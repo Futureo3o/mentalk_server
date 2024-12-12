@@ -1,11 +1,11 @@
 const Mentee = require('../models/mentee');
 const Review = require("../models/review");
-
+const CoffeeChat = require("../models/coffeeChat"); 
 
 //리뷰 작성
 const createReview = async(req,res)=>{
-    const {review_content,review_rating,mentee_id,coffeechat_id}=req.body;
-    
+    const{mentee_id,coffeechat_id}=req.params
+    const {review_content,review_rating}=req.body;
     if(!review_content || !review_rating || !coffeechat_id || !mentee_id){
         return res.status(400).json({
             error:"모든 내용을 채워주세요",
@@ -14,12 +14,12 @@ const createReview = async(req,res)=>{
     }
     try{
         const mentee = await Mentee.findOne({mentee_id:mentee_id});
-        if(!mentee){
+        if (!mentee) {
             return res.status(404).json({
-                error: "멘티를 찾을 수 없습니다.",
-                message:"해당 멘티 ID에 해당하는 멘티가 존재하지 않습니다."
+              error: "멘티를 찾을 수 없습니다.",
+              message: "해당 멘티 아이디에 해당하는 멘티가 존재하지 않습니다."
             });
-        }
+          }
         const mentee_nickname =mentee.mentee_nickname;
 
         const newReview =new Review({
@@ -31,6 +31,7 @@ const createReview = async(req,res)=>{
         });
 
         const savedReview = await newReview.save();
+
         res.status(201).json({
             message:'리뷰 저장 완료',
             coffeechat_id :savedReview.coffeechat_id, 
@@ -70,25 +71,34 @@ const getReview_mentee_All =async (req,res) =>{
         });
     }
 };
-// 멘토 모든 리뷰 조회wnd
+// 멘토 모든 리뷰 조회
 const getReview_mentor_All =async (req,res) =>{
-    const {coffeechat_id,mentor_id}= req.params;
+    const { introduce_id } = req.params;
        
     try{
-        const reviews =await Review.find({mentor_id,coffeechat_id},
-            {  _id: 0,coffeechat_id:1,review_content: 1, review_rating: 1 }
-        );
-
-        if(reviews.length===0){
-            return res. status(404).json({
-                error:"리뷰가 없습니다",
-                message : "해당 멘토 아이디에 대한 리뷰가 존재하지 않습니다."
+        const coffeeChats = await CoffeeChat.find({ introduce_id: introduce_id });
+        if (coffeeChats.length === 0) {
+            return res.status(404).json({
+                error: "커피챗이 없습니다.",
+                message: "해당 자기소개 페이지 고유 아이디에 맞는 커피챗이 존재하지 않습니다."
             });
         }
-        return res.status(200).json({
-            message:"리뷰 목록 리스트 성공",
-            reviews: reviews ,
+
+        const reviews = await Review.find({
+            coffeechat_id: { $in: coffeeChats.map(chat => chat._id) }  // 커피챗 ID 배열을 사용하여 리뷰 조회
         });
+        if (reviews.length === 0) {
+            return res.status(404).json({
+                error: "리뷰가 없습니다.",
+                message: "해당 자기소개 페이지에 대한 리뷰가 존재하지 않습니다."
+            });
+        }
+
+        return res.status(200).json({
+            message: "리뷰 조회 성공",
+            reviews: reviews
+        });
+
     }catch(error){
         return res.status(500).json({
             error:'서버 오류',

@@ -8,9 +8,7 @@ const reviewSchema = new mongoose.Schema(
         ref: "CoffeeChat", 
         required: true,},
       mentor_id:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Mentor",
-        required: true, 
+        type: String,
       },
       mentee_id:{type:String ,ref:"Mentee",required:true},
       mentee_nickname:{type:String,required:true},
