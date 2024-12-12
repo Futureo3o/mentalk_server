@@ -1,6 +1,23 @@
 const Mentor = require("../models/mentor");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
+
+//multer 설정 코드
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./public/images");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage }).fields([
+  { name: "mentor_img", maxCount: 1 }, // 프로필 이미지
+  { name: "mentor_paper_img", maxCount: 1 }, // 재직증명서 이미지
+]);
 
 //멘토 유저 생성
 const createMentorUser = async (req, res) => {
@@ -119,22 +136,36 @@ const getMentorUserById = async (req, res) => {
 const updateMentorUser = async (req, res) => {
   try {
     const { mentor_id } = req.params;
-    const { mentor_img, mentor_nickname, mentor_company, mentor_category, mentor_position } = req.body;
-    const fixData = { mentor_img, mentor_nickname, mentor_company, mentor_category, mentor_position };
+    const { mentor_nickname, mentor_company, mentor_category, mentor_position } = req.body;
+    let { mentor_img, mentor_paper_img } = req.body;
+
+    // 파일 업로드 처리
+    if (req.files) {
+      if (req.files["mentor_img"]) {
+        mentor_img = req.files["mentor_img"][0].path; // 업로드된 프로필 이미지 경로
+      }
+      if (req.files["mentor_paper_img"]) {
+        mentor_paper_img = req.files["mentor_paper_img"][0].path; // 업로드된 재직증명서 이미지 경로
+      }
+    }
+
     const user = await Mentor.findOne({ mentor_id: mentor_id });
 
     if (!user) {
       return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
     }
 
+    const fixData = { mentor_img, mentor_paper_img, mentor_nickname, mentor_company, mentor_category, mentor_position };
+
     if (mentor_img) user.mentor_img = mentor_img;
+    if (mentor_paper_img) user.mentor_paper_img = mentor_paper_img;
     if (mentor_nickname) user.mentor_nickname = mentor_nickname;
     if (mentor_company) user.mentor_company = mentor_company;
     if (mentor_category) user.mentor_category = mentor_category;
     if (mentor_position) user.mentor_position = mentor_position;
 
     await user.save();
-    res.status(200).json({ message: "유저를 성공적으로 수정하였습니다." });
+    res.status(200).json({ message: "유저를 성공적으로 수정하였습니다.", data: fixData });
   } catch (error) {
     console.error("멘토 유저 수정 실패 : ", error);
     res.status(500).json({ error: "유저를 업데이트하는 도중 오류가 발생했습니다." });
@@ -247,7 +278,7 @@ const mentorAccessToken = async (req, res) => {
         mentor_category: user.mentor_category,
         mentor_position: user.mentor_position,
         mentor_career: user.mentor_career,
-        mentor_img: user.mentor_img,
+        mentor_paper_img: user.mentor_img,
       },
     });
   } catch (error) {
@@ -351,4 +382,5 @@ module.exports = {
   updateMentorUser,
   deleteMentorUser,
   loginMentorUser,
+  upload,
 };
