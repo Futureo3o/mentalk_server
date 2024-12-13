@@ -12,5 +12,5 @@ router.put("/:coffeechat_id/:mentee_id",reviewController.updateReview)
 router.delete("/:coffeechat_id/:mentee_id",reviewController.deleteReview)
 
 //멘토 관련
-router.get("/:introduce_id",reviewController.getReview_mentor_All)
+router.get("/:mentor_id",reviewController.getReview_mentor_All)
 module.exports = router;

@@ -1,6 +1,7 @@
 const Mentee = require('../models/mentee');
 const Review = require("../models/review");
 const CoffeeChat = require("../models/coffeeChat"); 
+const MentorIntroduce=require('../models/mentorIntroduce');
 
 //리뷰 작성
 const createReview = async(req,res)=>{
@@ -73,38 +74,30 @@ const getReview_mentee_All =async (req,res) =>{
 };
 // 멘토 모든 리뷰 조회
 const getReview_mentor_All =async (req,res) =>{
-    const { introduce_id } = req.params;
+    const  {mentor_id}  = req.params;
+       try{
+            const mentorIntroduce_id = await MentorIntroduce.find({mentor_id:mentor_id});
+            //멘토 아이디 유무 확인
+            if(!mentorIntroduce_id || mentorIntroduce_id.length ===0){
+                return res.status(404).json ({message:"멘토의 소개 페이지가 존재하지 않습니다."});
+            }
+            // 소개페이지 아이디와 일치하는 커피챗 확인
+            const coffee_Chats =await CoffeeChat.find({
+                mentor_id:mentor_id,
+                introduce_id:{$in: mentorIntroduce_id.map(introduce_id =>introduce_id._id)}
+            });
+
+            if(!coffee_Chats||coffee_Chats.length===0){
+                return res.status(404).json({message : "해당 멘토의 커피챗이 없습니다."});
+            }
+
+            const coffee_ChatsId=coffee_Chats.map(chat=>chat._id);
+            const reviews= await Review.find({coffeechat_id:{$in: coffee_ChatsId}}).populate("mentee_id","mentee_nickname");
        
-    try{
-        const coffeeChats = await CoffeeChat.find({ introduce_id: introduce_id });
-        if (coffeeChats.length === 0) {
-            return res.status(404).json({
-                error: "커피챗이 없습니다.",
-                message: "해당 자기소개 페이지 고유 아이디에 맞는 커피챗이 존재하지 않습니다."
-            });
-        }
-
-        const reviews = await Review.find({
-            coffeechat_id: { $in: coffeeChats.map(chat => chat._id) }  // 커피챗 ID 배열을 사용하여 리뷰 조회
-        });
-        if (reviews.length === 0) {
-            return res.status(404).json({
-                error: "리뷰가 없습니다.",
-                message: "해당 자기소개 페이지에 대한 리뷰가 존재하지 않습니다."
-            });
-        }
-
-        return res.status(200).json({
-            message: "리뷰 조회 성공",
-            reviews: reviews
-        });
-
-    }catch(error){
-        return res.status(500).json({
-            error:'서버 오류',
-            message:'리뷰 조회 중 문제가 발생했습니다.'
-        });
-    }
+            res.json(reviews);
+        }catch(error){
+            res.status(500).json({message:"서버 오류"});
+       }
 };
 //멘티 특정 리뷰 조회
 const getReview =async(req,res)=>{

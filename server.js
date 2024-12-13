@@ -9,11 +9,14 @@
 // npm i jsonwebtoken
 // npm i multer
 // npm i path
+// npm install swagger-jsdoc swagger-ui-express
 
 const express = require("express");
 const connectDB = require("./config/db.js");
 require("dotenv").config();
 const cors = require("cors");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./config/swaggerConfig.js");
 const userRouter = require("./routes/userRouter.js");
 const mentorRouter = require("./routes/mentorRouter.js");
 const menteeRouter = require("./routes/menteeRouter.js");
@@ -35,6 +38,9 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use("./public", express.static("public"));
+
+//swagger ui 미들웨어 설정
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // CORS 설정
 app.use(
