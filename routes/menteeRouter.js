@@ -13,15 +13,15 @@ const router = express.Router();
  * @swagger
  * /mentee:
  *  get:
- *    summary: 모든 멘토 목록을 조회합니다.
- *    description : 데이터베이스에 저장된 모든 멘티 유저 정보를 반환합니다.
+ *    summary: 모든 멘티 목록을 조회합니다.
+ *    description: 데이터베이스에 저장된 모든 멘티 유저 정보를 반환합니다.
  *    tags:
  *      - mentee
  *    responses:
  *      200:
- *        description : 멘토 목록 조회 성공
+ *        description: 멘티 목록 조회 성공
  *      500:
- *        description :멘티 목록 조회 중 오류가 발생했습니다.
+ *        description: 멘티 목록 조회 중 오류가 발생했습니다.
  */
 router.get("/", menteeRouter.getAllMenteeUser);
 
@@ -90,7 +90,7 @@ router.put("/:mentee_id", menteeRouter.updateMenteeUserById);
 
 /**
  * @swagger
- * /mentee/:{mentee_id}
+ * /mentee/{mentee_id}:
  *   delete:
  *     summary: 특정 멘티를 삭제합니다.
  *     description: 주어진 mentee_id에 해당하는 멘티를 데이터베이스에서 삭제합니다.
