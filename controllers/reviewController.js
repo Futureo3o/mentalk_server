@@ -2,6 +2,7 @@ const Mentee = require('../models/mentee');
 const Review = require("../models/review");
 const CoffeeChat = require("../models/coffeeChat"); 
 const MentorIntroduce=require('../models/mentorIntroduce');
+const review = require('../models/review');
 
 //리뷰 작성
 const createReview = async(req,res)=>{
@@ -74,28 +75,22 @@ const getReview_mentee_All =async (req,res) =>{
 };
 // 멘토 모든 리뷰 조회
 const getReview_mentor_All =async (req,res) =>{
-    const  {mentor_id}  = req.params;
+    const  {introduce_id }  = req.params;
+    
        try{
-            const mentorIntroduce_id = await MentorIntroduce.find({mentor_id:mentor_id});
-            //멘토 아이디 유무 확인
-            if(!mentorIntroduce_id || mentorIntroduce_id.length ===0){
-                return res.status(404).json ({message:"멘토의 소개 페이지가 존재하지 않습니다."});
-            }
-            // 소개페이지 아이디와 일치하는 커피챗 확인
-            const coffee_Chats =await CoffeeChat.find({
-                mentor_id:mentor_id,
-                introduce_id:{$in: mentorIntroduce_id.map(introduce_id =>introduce_id._id)}
-            });
-            // 커피챗 존재 유뮤 확인인
-            if(!coffee_Chats||coffee_Chats.length===0){
-                return res.status(404).json({message : "해당 멘토의 커피챗이 없습니다."});
-            }
-            
-            const coffee_ChatsId=coffee_Chats.map(chat=>chat._id);
-            const reviews= await Review.find({coffeechat_id:{$in: coffee_ChatsId}}).populate("mentee_id","mentee_nickname");
-       
-            res.json(reviews);
-        }catch(error){
+        const coffee_Chats=await CoffeeChat.find({
+            introduce_id:introduce_id,
+        });
+        if(!coffee_Chats||coffee_Chats.length===0){
+            return res.status(404).json({message:"해당 멘토의 커피챗은 없습니다."});
+        }
+
+        const coffee_ChatsId=coffee_Chats.map(chat=>chat._id);
+
+        const reviews =await Review.find({coffeechat_id:{$in:coffee_ChatsId}}).populate("mentee_id","mentee_nickname");
+        
+        res.json(reviews);
+    }catch(error){
             res.status(500).json({message:"서버 오류"});
        }
 };
@@ -114,7 +109,7 @@ const getReview =async(req,res)=>{
        mentee_review:mentee_review
     });
    }catch(error){
-        res.status(500).json({error:'리뷰 조회 중 오류가 발생했습니다.'});
+        res.status(500).json({error:'리뷰 조회 중 오류가fdqwdqwdqw  발생했습니다.'});
    }
 };
 //리뷰 수정

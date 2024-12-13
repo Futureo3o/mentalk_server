@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 //리뷰 
 const reviewSchema = new mongoose.Schema(
@@ -7,9 +7,6 @@ const reviewSchema = new mongoose.Schema(
       coffeechat_id :{type: mongoose.Schema.Types.ObjectId,
         ref: "CoffeeChat", 
         required: true,},
-      mentor_id:{
-        type: String,
-      },
       mentee_id:{type:String ,ref:"Mentee",required:true},
       mentee_nickname:{type:String,required:true},
       review_content:{type:String, required:true},
