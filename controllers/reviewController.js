@@ -86,11 +86,11 @@ const getReview_mentor_All =async (req,res) =>{
                 mentor_id:mentor_id,
                 introduce_id:{$in: mentorIntroduce_id.map(introduce_id =>introduce_id._id)}
             });
-
+            // 커피챗 존재 유뮤 확인인
             if(!coffee_Chats||coffee_Chats.length===0){
                 return res.status(404).json({message : "해당 멘토의 커피챗이 없습니다."});
             }
-
+            
             const coffee_ChatsId=coffee_Chats.map(chat=>chat._id);
             const reviews= await Review.find({coffeechat_id:{$in: coffee_ChatsId}}).populate("mentee_id","mentee_nickname");
        
