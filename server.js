@@ -15,6 +15,7 @@ const express = require("express");
 const connectDB = require("./config/db.js");
 require("dotenv").config();
 const cors = require("cors");
+const path = require("path");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swaggerConfig.js");
 const userRouter = require("./routes/userRouter.js");
@@ -37,7 +38,7 @@ const app = express();
 // 미들웨어
 app.use(express.json());
 app.use(cookieParser());
-app.use("./public", express.static("public"));
+app.use("/public", express.static(path.join(__dirname, "public")));
 
 //swagger ui 미들웨어 설정
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
