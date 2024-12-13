@@ -30,6 +30,7 @@ const logoutMenteeRouter = require("./routes/logoutMenteeRouter.js");
 const coffeeChatRouter = require("./routes/coffeeChatRouter.js");
 const reviewRouter = require("./routes/reviewRouter.js");
 const mentorIntroduceRouter = require("./routes/mentorIntroduceRouter.js");
+const warningRouter = require("./routes/warningRouter.js");
 
 const cookieParser = require("cookie-parser");
 
@@ -81,6 +82,9 @@ app.use("/intro", mentorIntroduceRouter);
 
 //커피챗 관련 라우터
 app.use("/coffeechat", coffeeChatRouter);
+
+//경고 관련 라우터
+app.use("/warning", warningRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(`${process.env.PORT}번 포트에서 서버가 실행 중...`);

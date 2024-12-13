@@ -167,10 +167,11 @@ const loginMenteeUser = async (req, res) => {
     const accessToken = jwt.sign(
       {
         mentee_id: user.mentee_id,
+        role: "mentee",
       },
       process.env.MENTEE_ACCESS_SECRET,
       {
-        expiresIn: "2m",
+        expiresIn: "30m",
         issuer: "About Tech",
       }
     );
@@ -178,6 +179,7 @@ const loginMenteeUser = async (req, res) => {
     const refreshToken = jwt.sign(
       {
         mentee_id: user.mentee_id,
+        role: "mentee",
       },
       process.env.MENTEE_REFRESH_SECRET,
       {
@@ -259,10 +261,11 @@ const menteeRefreshToken = async (req, res) => {
     const newAccessToken = jwt.sign(
       {
         mentor_id: user.mentor_id,
+        role: "mentee",
       },
       process.env.MENTEE_ACCESS_SECRET,
       {
-        expiresIn: "2m",
+        expiresIn: "30m",
         issuer: "About Tech",
       }
     );
