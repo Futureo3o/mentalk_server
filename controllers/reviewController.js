@@ -17,24 +17,19 @@ const createReview = async (req, res) => {
         return res.status(400).json({ message: '리뷰 평점은 1에서 5 사이여야 합니다.' });
       }
   
-      // 커피챗 조회
       const coffeeChat = await CoffeeChat.findById(coffeechat_id);
       if (!coffeeChat) return res.status(404).json({ message: '커피챗을 찾을 수 없습니다.' });
   
-      // 멘티 조회 (멘티 아이디는 string 타입)
       const mentee = await Mentee.findOne({ mentee_id: mentee_id });
       if (!mentee) return res.status(404).json({ message: '멘티를 찾을 수 없습니다.' });
   
-      // 커피챗에서 mentor_id, introduce_id 가져오기
-      const mentor_id = coffeeChat.mentor_id;  // 커피챗에서 mentor_id 가져오기
-      const introduce_id = coffeeChat.introduce_id;  // 커피챗에서 mentorIntroduce_id 가져오기
-      const mentee_nickname = mentee.mentee_nickname;  // 멘티의 닉네임 가져오기
-  
-      // 리뷰 생성
+      const mentor_id = coffeeChat.mentor_id;  
+      const introduce_id = coffeeChat.introduce_id;  
+      const mentee_nickname = mentee.mentee_nickname;  
       const newReview = new Review({
         coffeechat_id,
         introduce_id,
-        mentor_id, // 커피챗에서 가져온 멘토 아이디
+        mentor_id,
         mentee_id,
         mentee_nickname,
         review_content,
@@ -43,7 +38,12 @@ const createReview = async (req, res) => {
   
       await newReview.save();
   
-      res.status(201).json({ message: '리뷰가 성공적으로 작성되었습니다.' });
+      res.status(200).json({ message: '리뷰가 성공적으로 작성되었습니다.' ,
+        review_content,
+      review_rating,
+      mentee_id,
+      coffeechat_id,
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: '서버 오류가 발생했습니다.' });
