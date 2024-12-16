@@ -16,7 +16,7 @@ const warningController = require("../controllers/warningController");
  *     summary: 경고 업데이트
  *     description: 멘토 또는 멘티에게 경고를 추가하는 API입니다.
  *     tags:
- *       - Warning
+ *       - warning
  *     requestBody:
  *       description: 경고 사유를 포함한 요청 본문
  *       required: true
