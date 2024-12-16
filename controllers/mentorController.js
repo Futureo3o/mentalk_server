@@ -281,7 +281,8 @@ const mentorAccessToken = async (req, res) => {
           mentor_category: user.mentor_category,
           mentor_position: user.mentor_position,
           mentor_career: user.mentor_career,
-          mentor_paper_img: user.mentor_img,
+          mentor_img: user.mentor_img,
+          mentor_paper_img: user.mentor_paper_img,
         },
       });
     } catch (err) {

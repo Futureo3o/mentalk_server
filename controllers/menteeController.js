@@ -1,6 +1,20 @@
 const Mentee = require("../models/mentee");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
+
+//multer 설정 코드
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./public/images");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage }).fields([{ name: "mentee_img", maxCount: 1 }]);
 
 //멘티 유저 생성
 const createMenteeUser = async (req, res) => {
@@ -107,7 +121,15 @@ const getMenteeUserById = async (req, res) => {
 const updateMenteeUserById = async (req, res) => {
   try {
     const { mentee_id } = req.params;
-    const { mentee_img, mentee_nickname, mentee_position } = req.body;
+    const { mentee_nickname, mentee_position } = req.body;
+    const { mentee_img } = req.body;
+
+    //파일 업로드 처리
+    if (req.files) {
+      if (req.files["mentee_img"]) {
+        mentee_img = req.files["mentee_img"][0].path;
+      }
+    }
 
     const user = await Mentee.findOne({ mentee_id: mentee_id });
 
@@ -115,12 +137,14 @@ const updateMenteeUserById = async (req, res) => {
       return res.status(404).json({ error: "찾는 유저 id가 존재하질 않습니다." });
     }
 
+    const fixData = { mentee_img, mentee_nickname, mentee_position };
+
     if (mentee_img) user.mentee_img = mentee_img;
     if (mentee_nickname) user.mentee_nickname = mentee_nickname;
     if (mentee_position) user.mentee_position = mentee_position;
 
     await user.save();
-    res.status(200).json({ message: "유저를 성공적으로 수정하였습니다." });
+    res.status(200).json({ message: "유저를 성공적으로 수정하였습니다.", data: fixData });
   } catch (error) {
     console.error("멘티 유저 정보 실패 : ", error);
     res.status(500).json({ error: "유저를 업데이트하는 도중 오류가 발생했습니다." });
@@ -331,4 +355,5 @@ module.exports = {
   getMenteeUserById,
   updateMenteeUserById,
   deleteMenteeUserById,
+  upload,
 };
