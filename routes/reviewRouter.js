@@ -6,15 +6,16 @@ const router = express.Router();
 
 // /review/*
 //멘티 관련
-router.post("/:coffeechat_id/:mentee_id", reviewController.createReview);
-
-//멘토 관련
-router.get("/introducereview/:introduce_id", reviewController.getReview_mentor_All);
-router.get("/:mentee_id",reviewController.getReview_mentee_All);
-
-router.get("/:coffeechat_id/:mentee_id", reviewController.getReview);
-router.put("/:coffeechat_id/:mentee_id",reviewController.updateReview);
-router.delete("/:coffeechat_id/:mentee_id",reviewController.deleteReview);
-// delete("/:review_id")
-
+//생성
+router.post("/:coffeechat_id/:mentee_id", reviewController.createReview); // 리뷰 생성
+//멘토아이디 조회
+router.get('/mentor/:mentor_id', reviewController.getReviewByMentor);
+//멘티아이디 조회
+router.get("/mentee/:mentee_id",reviewController.getReviewByMentee);
+//멘토소개페이지아이디 조회
+router.get("/introduce/:introduce_id",reviewController.getReviewByIntroduce);
+//리뷰 수정
+router.put("/:review_id",reviewController.updateReview);
+//리뷰삭제
+router.delete("/:review_id",reviewController.deleteReview);
 module.exports = router;
