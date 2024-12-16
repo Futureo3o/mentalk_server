@@ -39,4 +39,24 @@ const createAdminUser = async (req, res) => {
   }
 };
 
-module.exports = { createAdminUser };
+const getAllAdminUser = async (req, res) => {
+  try {
+    const adminAllUser = await Admin.find();
+
+    const filterAdmin = Admin.map((admin) => {
+      const { admin_pw, ...rest } = admin.toObject();
+      return rest;
+    });
+
+    if (!adminAllUser) {
+      return res.status(404).json({ error: "관리자 조회 요청이 실패했습니다." });
+    }
+
+    res.status(200).json({ message: "관리자 조회 기능이 성공했습니다.", data: filterAdmin });
+  } catch (error) {
+    console.error("관리자 조회 실패 : ", error);
+    res.status(500).json({ error: "관리자 조회 기능 도중 에러가 발생했습니다." });
+  }
+};
+
+module.exports = { createAdminUser, getAllAdminUser };

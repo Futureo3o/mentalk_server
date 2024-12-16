@@ -122,7 +122,7 @@ const updateMenteeUserById = async (req, res) => {
   try {
     const { mentee_id } = req.params;
     const { mentee_nickname, mentee_position } = req.body;
-    const { mentee_img } = req.body;
+    let { mentee_img } = req.body;
 
     //파일 업로드 처리
     if (req.files) {
