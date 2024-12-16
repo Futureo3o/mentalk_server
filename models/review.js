@@ -7,9 +7,12 @@ const reviewSchema = new mongoose.Schema(
       coffeechat_id :{type: mongoose.Schema.Types.ObjectId,
         ref: "CoffeeChat", 
         required: true,},
-      mentor_id:{
-        type: String,
-      },
+         introduce_id: {
+              type: mongoose.Schema.Types.ObjectId, 
+              ref: "mentorIntroduce", 
+              required: true,
+            },
+      mentor_id:{type:String,ref:"Mentor",require:true},
       mentee_id:{type:String ,ref:"Mentee",required:true},
       mentee_nickname:{type:String,required:true},
       review_content:{type:String, required:true},
