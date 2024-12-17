@@ -6,7 +6,7 @@ const Mentee = require("../models/mentee.js");
 //커피챗 생성
 const createCoffeeChat = async (req, res) => {
   try {
-    const { introduce_id, mentor_id, mentee_id, coffee_request, coffee_wanted } = req.body;
+    const { introduce_id, mentor_id, mentee_id, coffee_request_date, coffee_request, coffee_wanted } = req.body;
 
     const mentorIntroduceId = await MentorIntroduce.findById(introduce_id);
     if (!mentorIntroduceId) {
@@ -19,10 +19,17 @@ const createCoffeeChat = async (req, res) => {
       return res.status(404).json({ error: "해당 멘토가 존재하지 않습니다." });
     }
 
+    const mentee = await Mentee.findOne({ mentee_id: mentee_id });
+
+    if (!mentee) {
+      return res.status(404).json({ error: "해당 멘티티가 존재하지 않습니다." });
+    }
+
     const newCoffeeChat = new CoffeeChat({
       introduce_id,
       mentor_id,
       mentee_id,
+      coffee_request_date,
       coffee_completed: null,
       coffee_status: "신청",
       coffee_cancle: null,
