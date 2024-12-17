@@ -33,6 +33,7 @@ const mentorIntroduceRouter = require("./routes/mentorIntroduceRouter.js");
 const warningRouter = require("./routes/warningRouter.js");
 const adminRouter = require("./routes/adminRouter.js");
 
+const favoriteRouter=require("./routes/favoriteRouter.js");
 const cookieParser = require("cookie-parser");
 
 const app = express();
@@ -80,7 +81,7 @@ app.use("/review", reviewRouter);
 
 //멘토 북마크 관련 라우터
 app.use("/intro", mentorIntroduceRouter);
-
+app.use("/favorite",favoriteRouter);
 //커피챗 관련 라우터
 app.use("/coffeechat", coffeeChatRouter);
 
