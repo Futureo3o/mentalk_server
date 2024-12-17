@@ -5,16 +5,16 @@ const Mentor = require("../models/mentor");
         //URL 요청 받음
         const {mentor_id} = req.params;        
         try{
-            const mentor_intro = await MentorIntroduce.findOne({mentor_id});
+            const mentor_introduce = await MentorIntroduce.findOne({mentor_id});
             
-            if(!mentor_intro){
+            if(!mentor_introduce){
                 return res.status(404).json({error : '멘토 아이디 조회 실패',     
                     message: '멘토 정보가 없습니다. 글 작성을 진행해주세요.',
                 });
             }
 
             res.json({
-               mentor_intro:mentor_intro
+                mentor_introduce:mentor_introduce
         });
         }catch(error){
             res.status(500).json({error:"멘토포스팅 조회 중 오류가 발생했습니다."});
@@ -25,8 +25,8 @@ const Mentor = require("../models/mentor");
     //멘토 자기소개페이지 작성
     const postMentorIntroduce =async(req,res)=>{
         const {mentor_id}=req.params;
-        const{mentor_title,mentor_content}=req.body;
-        if (!mentor_title || !mentor_content) {
+        const{introduce_title,introduce_content}=req.body;
+        if (!introduce_title || !introduce_content) {
             return res.status(400).json({
               error: "모든 내용을 채워주세요",
               message: "멘토 소개 제목과 내용을 모두 입력해야 합니다."
@@ -42,18 +42,18 @@ const Mentor = require("../models/mentor");
               }
               const newMentorIntroduce = new MentorIntroduce({
                 mentor_id,
-                mentor_title,
-                mentor_content
+                introduce_title,
+                introduce_content
               });
               const savedMentorIntroduce = await newMentorIntroduce.save();
               res.status(201).json({
                 message: "멘토 자기소개 페이지 작성 완료",
                 mentor_id: savedMentorIntroduce.mentor_id,
-                mentor_title: savedMentorIntroduce.mentor_title,
-                mentor_content: savedMentorIntroduce.mentor_content,
+                introduce_title: savedMentorIntroduce.introduce_title,
+                introduce_content: savedMentorIntroduce.introduce_content,
                 review_count: savedMentorIntroduce.review_count,
                 coffeechat_count: savedMentorIntroduce.coffeechat_count,
-                mentor_rating: savedMentorIntroduce.mentor_rating,
+                introduce_rating: savedMentorIntroduce.introduce_rating,
               });
               
           }catch (error) {
@@ -69,9 +69,9 @@ const Mentor = require("../models/mentor");
 //멘토 자기소개 수정
 const updateMentorIntroduce= async(req,res)=>{
     const {mentor_id}=req.params;
-    const{mentor_title,mentor_content}=req.body;
+    const{introduce_title,introduce_content}=req.body;
 
-    if (!mentor_title || !mentor_content) {
+    if (!introduce_title || !introduce_content) {
         return res.status(400).json({
             error: "자기소개 페이지 내용이없습니다.",
             message: "멘토 소개 페이지 내용이 없습니다.."
@@ -89,8 +89,8 @@ const updateMentorIntroduce= async(req,res)=>{
         const updatedMentorIntroduce = await MentorIntroduce.findOneAndUpdate(
             { mentor_id }, 
             { 
-                mentor_title,   
-                mentor_content, 
+                introduce_title,   
+                introduce_content, 
             },
             { new: true } 
         );
@@ -103,8 +103,8 @@ const updateMentorIntroduce= async(req,res)=>{
         res.status(200).json({
             message: "멘토 자기소개 수정 완료",
             mentor_id: updatedMentorIntroduce.mentor_id,
-            mentor_title: updatedMentorIntroduce.mentor_title,
-            mentor_content: updatedMentorIntroduce.mentor_content,
+            introduce_title: updatedMentorIntroduce.introduce_title,
+            introduce_content: updatedMentorIntroduce.introduce_content,
             review_count: updatedMentorIntroduce.review_count,
             coffeechat_count: updatedMentorIntroduce.coffeechat_count,
             mentor_rating: updatedMentorIntroduce.mentor_rating,
