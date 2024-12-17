@@ -15,6 +15,10 @@ const createCoffeeChat = async (req, res) => {
 
     const mentor = await Mentor.findOne({ mentor_id: mentor_id });
 
+    if (!mentor) {
+      return res.status(404).json({ error: "해당 멘토가 존재하지 않습니다." });
+    }
+
     const newCoffeeChat = new CoffeeChat({
       introduce_id,
       mentor_id,

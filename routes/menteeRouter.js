@@ -1,5 +1,5 @@
 const express = require("express");
-const menteeRouter = require("../controllers/menteeController");
+const menteeController = require("../controllers/menteeController");
 const router = express.Router();
 
 /**
@@ -23,7 +23,7 @@ const router = express.Router();
  *      500:
  *        description: 멘티 목록 조회 중 오류가 발생했습니다.
  */
-router.get("/", menteeRouter.getAllMenteeUser);
+router.get("/", menteeController.getAllMenteeUser);
 
 /**
  * @swagger
@@ -48,7 +48,7 @@ router.get("/", menteeRouter.getAllMenteeUser);
  *       500:
  *         description: 멘티 조회 중 오류가 발생했습니다.
  */
-router.get("/:mentee_id", menteeRouter.getMenteeUserById);
+router.get("/:mentee_id", menteeController.getMenteeUserById);
 
 /**
  * @swagger
@@ -86,7 +86,7 @@ router.get("/:mentee_id", menteeRouter.getMenteeUserById);
  *       500:
  *         description: 멘티 수정 중 오류가 발생했습니다.
  */
-router.put("/:mentee_id", menteeRouter.updateMenteeUserById);
+router.put("/:mentee_id", menteeController.upload, menteeController.updateMenteeUserById);
 
 /**
  * @swagger
@@ -111,6 +111,6 @@ router.put("/:mentee_id", menteeRouter.updateMenteeUserById);
  *       500:
  *         description: 멘티 삭제 중 오류가 발생했습니다.
  */
-router.delete("/:mentee_id", menteeRouter.deleteMenteeUserById);
+router.delete("/:mentee_id", menteeController.deleteMenteeUserById);
 
 module.exports = router;
