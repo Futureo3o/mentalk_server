@@ -42,33 +42,46 @@ const addFavorite = async (req, res) => {
   }
 };
 
-
 const getFavorites = async (req, res) => {
-    const { mentee_id } = req.params;
-  
-    try {
-      const favorites = await Favorite.find({ mentee_id }).populate('mentor_id', 'mentor_title mentor_content mentor_rating');
-      
-      if (favorites.length === 0) {
-        return res.status(404).json({
-          error: '즐겨찾기 목록이 없습니다.',
-          message: '이 멘티는 아직 즐겨찾기를 하지 않았습니다.',
-        });
-      }
-  
-      res.status(200).json({
-        message: '멘토의 즐겨찾기 목록을 조회했습니다.',
-        favorites: favorites,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        error: '서버 오류',
-        message: '즐겨찾기 목록 조회 중 오류가 발생했습니다.',
+  const { mentee_id } = req.params;
+
+  try {
+    const favorites = await Favorite.find({ mentee_id }); 
+
+    if (favorites.length === 0) {
+      return res.status(404).json({
+        error: '즐겨찾기 목록이 없습니다.',
+        message: '이 멘티는 아직 즐겨찾기를 하지 않았습니다.',
       });
     }
-  };
-  
+
+   
+    const mentorIds = favorites.map(fav => fav.mentor_id); 
+    const mentors = await Mentor.find({ mentor_id: { $in: mentorIds } }); 
+
+   
+    const favoritesWithMentors = favorites.map(fav => {
+      const mentor = mentors.find(m => m.mentor_id === fav.mentor_id);
+      return {
+        ...fav.toObject(),  
+        mentor_title: mentor ? mentor.mentor_title : null,
+        mentor_content: mentor ? mentor.mentor_content : null,
+        mentor_rating: mentor ? mentor.mentor_rating : null
+      };
+    });
+
+    res.status(200).json({
+      message: '멘토의 즐겨찾기 목록을 조회했습니다.',
+      favorites: favoritesWithMentors,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: '서버 오류',
+      message: '즐겨찾기 목록 조회 중 오류가 발생했습니다.',
+    });
+  }
+};
 
 const removeFavorite = async (req, res) => {
     const { mentor_id } = req.params;
