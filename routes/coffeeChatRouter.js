@@ -158,6 +158,6 @@ router.get("/mentor/:mentor_id", coffeeChatController.getAllCoffeeChatByMentorID
  *      500:
  *        description: 커피챗 수정 중 오류가 발생했습니다.
  */
-router.put("/:introduce_id", coffeeChatController.updateCoffeeChat);
+router.put("/:_id", coffeeChatController.updateCoffeeChat);
 
 module.exports = router;

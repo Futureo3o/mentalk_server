@@ -100,10 +100,10 @@ const getAllCoffeeChatByMentorID = async (req, res) => {
 //커피챗 수정
 const updateCoffeeChat = async (req, res) => {
   try {
-    const { introduce_id } = req.params;
+    const { _id } = req.params;
     const { coffee_completed, coffee_meeting_date, coffee_status, coffee_cancel } = req.body;
 
-    const coffeeChatData = await CoffeeChat.findOne({ introduce_id: introduce_id });
+    const coffeeChatData = await CoffeeChat.findOne({ _id: _id });
 
     if (!coffeeChatData) {
       return res.status(404).json({ error: "해당 커피챗이 존재하지 않습니다." });
