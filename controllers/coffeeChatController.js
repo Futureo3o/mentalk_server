@@ -31,8 +31,9 @@ const createCoffeeChat = async (req, res) => {
       mentee_id,
       coffee_request_date,
       coffee_completed: null,
+      coffee_meeting_date: null,
       coffee_status: "신청",
-      coffee_cancle: null,
+      coffee_cancel: null,
       coffee_request,
       coffee_wanted,
     });
@@ -83,8 +84,7 @@ const getCoffeeChatById = async (req, res) => {
 const updateCoffeeChat = async (req, res) => {
   try {
     const { introduce_id } = req.params;
-    const { coffee_completed, coffee_status, coffee_cancle } = req.body;
-    const fixData = { coffee_completed, coffee_status, coffee_cancle };
+    const { coffee_completed, coffee_meeting_date, coffee_status, coffee_cancel } = req.body;
 
     const coffeeChatData = await CoffeeChat.findOne({ introduce_id: introduce_id });
 
@@ -94,10 +94,11 @@ const updateCoffeeChat = async (req, res) => {
 
     if (coffee_completed) coffeeChatData.coffee_completed = coffee_completed;
     if (coffee_status) coffeeChatData.coffee_status = coffee_status;
-    if (coffee_cancle) coffeeChatData.coffee_cancle = coffee_cancle;
+    if (coffee_cancel) coffeeChatData.coffee_cancel = coffee_cancel;
+    if (coffee_meeting_date) coffeeChatData.coffee_meeting_date = coffee_meeting_date;
 
     await coffeeChatData.save();
-    res.status(200).json({ message: "커피챗 업데이트를 성공적으로 수정하였습니다.", data: fixData });
+    res.status(200).json({ message: "커피챗 업데이트를 성공적으로 수정하였습니다.", data: coffeeChatData });
   } catch (error) {
     console.error("커피챗 수정 실패 : ", error);
     res.status(500).json({ error: "커피챗 수정 요청 기능 도중 에러가 발생했습니다." });
