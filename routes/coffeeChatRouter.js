@@ -69,7 +69,7 @@ router.get("/", coffeeChatController.getAllCoffeeChat);
 
 /**
  * @swagger
- * /coffeechat/{introduce_id}:
+ * /coffeechat/introduce/{introduce_id}:
  *  get:
  *    summary: 특정 커피챗을 조회합니다.
  *    description: 특정 `introduce_id`를 가진 커피챗을 조회합니다.
@@ -90,7 +90,32 @@ router.get("/", coffeeChatController.getAllCoffeeChat);
  *      500:
  *        description: 커피챗 조회 중 오류가 발생했습니다.
  */
-router.get("/:introduce_id", coffeeChatController.getCoffeeChatById);
+router.get("/introduce/:introduce_id", coffeeChatController.getCoffeeChatById);
+
+/**
+ * @swagger
+ * /coffeechat/mentor/{mentor_id}:
+ *  get:
+ *    summary: 멘토 id로 커피챗을 조회합니다.
+ *    description: 특정 `mentor_id`를 가진 커피챗을 조회합니다.
+ *    tags:
+ *      - coffeeChat
+ *    parameters:
+ *      - name: mentor_id
+ *        in: path
+ *        description: 조회할 커피챗의 소개 ID
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      200:
+ *        description: 특정 커피챗 조회 성공
+ *      404:
+ *        description: 해당 커피챗이 존재하지 않습니다.
+ *      500:
+ *        description: 커피챗 조회 중 오류가 발생했습니다.
+ */
+router.get("/mentor/:mentor_id", coffeeChatController.getAllCoffeeChatByMentorID);
 
 /**
  * @swagger
@@ -133,6 +158,6 @@ router.get("/:introduce_id", coffeeChatController.getCoffeeChatById);
  *      500:
  *        description: 커피챗 수정 중 오류가 발생했습니다.
  */
-router.put("/:introduce_id", coffeeChatController.updateCoffeeChat);
+router.put("/:_id", coffeeChatController.updateCoffeeChat);
 
 module.exports = router;

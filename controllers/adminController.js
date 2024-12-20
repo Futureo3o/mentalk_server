@@ -43,7 +43,7 @@ const getAllAdminUser = async (req, res) => {
   try {
     const adminAllUser = await Admin.find();
 
-    const filterAdmin = Admin.map((admin) => {
+    const filterAdmin = adminAllUser.map((admin) => {
       const { admin_pw, ...rest } = admin.toObject();
       return rest;
     });
@@ -59,4 +59,21 @@ const getAllAdminUser = async (req, res) => {
   }
 };
 
-module.exports = { createAdminUser, getAllAdminUser };
+const getAdminById = async (req, res) => {
+  try {
+    const { admin_id } = req.body;
+    const adminUser = await Admin.findOne({ admin_id: admin_id });
+    if (!adminUser) {
+      return res.status(404).json("특정 어드민 계정 조회 실패");
+    }
+
+    const { admin_pw, ...rest } = adminUser.toObject();
+
+    res.status(200).json({ message: "어드민 조회 성공하였습니다.", data: rest });
+  } catch (error) {
+    console.error("특정 어드민 계정 조회 실패 : ", error);
+    res.status(500).json({ error: "어드민 특정 계정 조회 기능 도중 에러가 발생했습니다." });
+  }
+};
+
+module.exports = { createAdminUser, getAllAdminUser, getAdminById };
