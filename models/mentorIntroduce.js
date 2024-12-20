@@ -8,6 +8,7 @@ const mentorIntroduceSchema = new mongoose.Schema(
       review_count : {type:Number, default: 0},
       coffeechat_count:{type:Number,default:0},
       introduce_rating:{type:Number,default:0},
+      //태그
     },
     { timestamps: true }
   );
