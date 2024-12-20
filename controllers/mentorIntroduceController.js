@@ -21,6 +21,22 @@ const Mentor = require("../models/mentor");
         }
     };
 
+//자기 소개페이지 리스트 조회
+
+const getMentorIntroduceList =async(req,res)=>{
+    try{
+        const IntroduceList =await MentorIntroduce.find();
+
+        if(IntroduceList.length === 0 )
+        {
+            return res.status(404).json({message:"자기 소개페이지가 존재하지 않습니다."});
+        }
+        return res.status(200).json(IntroduceList);
+
+    }catch(error){
+        return res.status(500).json({message: "서버 에러"});
+    }
+}
 
     //멘토 자기소개페이지 작성
     const postMentorIntroduce =async(req,res)=>{
@@ -120,4 +136,4 @@ const updateMentorIntroduce= async(req,res)=>{
 };
 
 
-module.exports = { getMentorIntroduce,postMentorIntroduce,updateMentorIntroduce };
+module.exports = { getMentorIntroduce,postMentorIntroduce,updateMentorIntroduce,getMentorIntroduceList };
