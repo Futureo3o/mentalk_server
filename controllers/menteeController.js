@@ -336,7 +336,12 @@ const menteeLoginSuccess = async (req, res) => {
 
 const menteeLogout = (req, res) => {
   try {
-    req.cookie("accessToken", "");
+    res.cookie("accessToken", "", {
+      expires: new Date(0),
+    });
+    res.cookie("refreshToken", "", {
+      expires: new Date(0),
+    });
     res.status(200).json({ message: "로그아웃 성공" });
   } catch (error) {
     console.error("로그아웃 실패");

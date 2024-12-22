@@ -383,8 +383,13 @@ const mentorLoginSuccess = async (req, res) => {
 // mentorLogout: 로그아웃 처리 (액세스 토큰 제거)
 const mentorLogout = (req, res) => {
   try {
-    req.cookie("accessToken", "");
-    res.status(200).json({ message: "로그아웃 성공" });
+    res.cookie("accessToken", "", {
+      expires: new Date(0),
+    });
+    res.cookie("refreshToken", "", {
+      expires: new Date(0),
+    });
+    res.status(200).json({ message: "로그아웃 성공공" });
   } catch (error) {
     console.error("로그아웃 실패");
     res.status(500).json({ error: "로그아웃 실패했습니다." });
