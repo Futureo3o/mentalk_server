@@ -58,13 +58,17 @@ const getMentorIntroduceList =async(req,res)=>{
     //멘토 자기소개페이지 작성
     const postMentorIntroduce =async(req,res)=>{
         const {mentor_id}=req.params;
-        const{introduce_title,introduce_content}=req.body;
-        if (!introduce_title || !introduce_content) {
+        const{introduce_title,introduce_content,tags}=req.body;
+
+
+        if (!introduce_title || !introduce_content||!tags||!Array.isArray(tags)) {
             return res.status(400).json({
               error: "모든 내용을 채워주세요",
-              message: "멘토 소개 제목과 내용을 모두 입력해야 합니다."
+              message: "멘토 소개 제목, 내용, 그리고 태그를 모두 입력해야 합니다."
             });
           }
+
+
           try{
             const mentor_check =await Mentor.findOne({mentor_id:mentor_id});
             if (!mentor_check) {
@@ -73,10 +77,13 @@ const getMentorIntroduceList =async(req,res)=>{
                   message: "해당 멘토 아이디에 해당하는 멘토가 존재하지 않습니다."
                 });
               }
+
+
               const newMentorIntroduce = new MentorIntroduce({
                 mentor_id,
                 introduce_title,
-                introduce_content
+                introduce_content,
+                tags
               });
               const savedMentorIntroduce = await newMentorIntroduce.save();
               res.status(201).json({
@@ -84,6 +91,7 @@ const getMentorIntroduceList =async(req,res)=>{
                 mentor_id: savedMentorIntroduce.mentor_id,
                 introduce_title: savedMentorIntroduce.introduce_title,
                 introduce_content: savedMentorIntroduce.introduce_content,
+                tags:savedMentorIntroduce.tags,
                 review_count: savedMentorIntroduce.review_count,
                 coffeechat_count: savedMentorIntroduce.coffeechat_count,
                 introduce_rating: savedMentorIntroduce.introduce_rating,
@@ -102,12 +110,12 @@ const getMentorIntroduceList =async(req,res)=>{
 //멘토 자기소개 수정
 const updateMentorIntroduce= async(req,res)=>{
     const {mentor_id}=req.params;
-    const{introduce_title,introduce_content}=req.body;
+    const{introduce_title,introduce_content,tags}=req.body;
 
-    if (!introduce_title || !introduce_content) {
+    if (!introduce_title || !introduce_content||(tags && !Array.isArray(tags))) {
         return res.status(400).json({
             error: "자기소개 페이지 내용이없습니다.",
-            message: "멘토 소개 페이지 내용이 없습니다.."
+            message: "멘토 소개 페이지 내용과 태그가 없습니다."
         });
     }
     try{
@@ -124,6 +132,7 @@ const updateMentorIntroduce= async(req,res)=>{
             { 
                 introduce_title,   
                 introduce_content, 
+                tags,
             },
             { new: true } 
         );
@@ -137,6 +146,7 @@ const updateMentorIntroduce= async(req,res)=>{
             message: "멘토 자기소개 수정 완료",
             mentor_id: updatedMentorIntroduce.mentor_id,
             introduce_title: updatedMentorIntroduce.introduce_title,
+            tags: updatedMentorIntroduce.tags,
             introduce_content: updatedMentorIntroduce.introduce_content,
             review_count: updatedMentorIntroduce.review_count,
             coffeechat_count: updatedMentorIntroduce.coffeechat_count,
