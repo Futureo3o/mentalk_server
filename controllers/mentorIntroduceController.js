@@ -12,10 +12,36 @@ const Mentor = require("../models/mentor");
                     message: '멘토 정보가 없습니다. 글 작성을 진행해주세요.',
                 });
             }
-
-            res.json({
-                mentor_introduce:mentor_introduce
-        });
+            const mentor_info =await Mentor.findOne({mentor_id});
+            if(!mentor_info){
+                return res.status(404).json({
+                    error:"멘토 아이디 조회 실패",
+                    message: "멘토 기본 정보가 없습니다."
+                })
+            }
+            const result = {
+                mentor_id: mentor_introduce.mentor_id,
+                introduce_title: mentor_introduce.introduce_title,
+                introduce_content: mentor_introduce.introduce_content,
+                review_count: mentor_introduce.review_count,
+                coffeechat_count: mentor_introduce.coffeechat_count,
+                introduce_rating: mentor_introduce.introduce_rating,
+                tags: mentor_introduce.tags,
+                mentor_nickname: mentor_info.mentor_nickname,
+                mentor_email: mentor_info.mentor_email,
+                mentor_phone: mentor_info.mentor_phone,
+                mentor_company: mentor_info.mentor_company,
+                mentor_position: mentor_info.mentor_position,
+                mentor_img: mentor_info.mentor_img,  
+                mentor_career: mentor_info.mentor_career,
+                mentor_is_checked: mentor_info.mentor_is_checked,
+                mentor_social_login: mentor_info.mentor_social_login,
+                mentor_gender: mentor_info.mentor_gender,
+                mentor_warnning_count: mentor_info.mentor_warnning_count,
+                mentor_favorite_count: mentor_info.mentor_favorite_count,
+                mentor_suspension: mentor_info.mentor_suspension,
+              };
+            res.json(result);
         }catch(error){
             res.status(500).json({error:"멘토포스팅 조회 중 오류가 발생했습니다."});
         }
