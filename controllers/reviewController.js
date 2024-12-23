@@ -73,6 +73,7 @@ const getReviewByMentor = async (req, res) => {
     }
   };
 
+  //멘티 조회
   const getReviewByMentee = async (req, res) => {
     const { mentee_id } = req.params; 
     

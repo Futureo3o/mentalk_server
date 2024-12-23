@@ -1,6 +1,7 @@
 const Favorite = require('../models/favorite');
 const Mentor = require('../models/mentor');
 
+//북마크 추가
 const addFavorite = async (req, res) => {
   const { mentor_id } = req.params;
   const { mentee_id } = req.body;
@@ -42,6 +43,7 @@ const addFavorite = async (req, res) => {
   }
 };
 
+//북마크 조회
 const getFavorites = async (req, res) => {
   const { mentee_id } = req.params;
 
@@ -83,6 +85,7 @@ const getFavorites = async (req, res) => {
   }
 };
 
+//북마크 취소
 const removeFavorite = async (req, res) => {
     const { mentor_id } = req.params;
     const { mentee_id } = req.body;
