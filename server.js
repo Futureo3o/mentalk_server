@@ -89,7 +89,7 @@ server.listen(8081, () => {
   console.log("socket running on 8081");
 });
 
-// CORS 설정
+// CORS 설정.
 app.use(
   cors({
     origin: "http://localhost:3000", // 허용할 도메인
