@@ -89,6 +89,7 @@ server.listen(8081, () => {
 });
 
 // 미들웨어
+app.use("/chat", chatRouter);
 app.use(express.json());
 app.use(cookieParser());
 app.use("/public", express.static(path.join(__dirname, "public")));
