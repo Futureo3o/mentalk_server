@@ -10,6 +10,8 @@
 // npm i multer
 // npm i path
 // npm install swagger-jsdoc swagger-ui-express
+// npm i socket.io
+// npm i http
 
 const express = require("express");
 const connectDB = require("./config/db.js");
@@ -34,10 +36,57 @@ const warningRouter = require("./routes/warningRouter.js");
 const adminRouter = require("./routes/adminRouter.js");
 const signupAdminRouter = require("./routes/signupAdminRouter.js");
 
-const favoriteRouter=require("./routes/favoriteRouter.js");
+const favoriteRouter = require("./routes/favoriteRouter.js");
 const cookieParser = require("cookie-parser");
 
+const { Server, Socket } = require("socket.io");
+const http = require("http");
+const Chat = require("./models/chat.js");
+
 const app = express();
+
+const server = http.createServer(app);
+
+//챗 통신 서버 코드
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("user connected", socket.id);
+
+  //특정 채팅방에 메시지 처리
+  socket.on("joinRoom", (coffeechatId) => {
+    socket.join(coffeechatId);
+    console.log(`유저가 접속했습니다 : ${coffeechatId}`);
+  });
+
+  socket.on("message", async (data) => {
+    const { coffeechatId, message, userId } = data;
+
+    console.log(`userId : ${userId}`);
+
+    try {
+      const newChat = new Chat({
+        coffeechat_id: coffeechatId,
+        user_id: userId,
+        message: message,
+      });
+      const savedChat = await newChat.save();
+      io.to(coffeechatId).emit("message", savedChat);
+      console.log(savedChat);
+    } catch (error) {
+      console.error("error");
+    }
+  });
+});
+
+server.listen(8081, () => {
+  console.log("socket running on 8081");
+});
 
 // 미들웨어
 app.use(express.json());
@@ -82,7 +131,7 @@ app.use("/review", reviewRouter);
 
 //멘토 북마크 관련 라우터
 app.use("/intro", mentorIntroduceRouter);
-app.use("/favorite",favoriteRouter);
+app.use("/favorite", favoriteRouter);
 //커피챗 관련 라우터
 app.use("/coffeechat", coffeeChatRouter);
 
