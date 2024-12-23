@@ -2,7 +2,7 @@ const Chat = require("../models/chat");
 
 const getChat = async (req, res) => {
   try {
-    const { coffeechat_id } = req.parmas;
+    const { coffeechat_id } = req.params;
     const chatList = await Chat.find({ coffeechat_id: coffeechat_id });
     res.status(200).json({ message: "이전 채팅 로딩 성공", data: chatList });
   } catch (error) {
