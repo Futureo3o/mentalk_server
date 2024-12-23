@@ -89,15 +89,6 @@ server.listen(8081, () => {
   console.log("socket running on 8081");
 });
 
-// 미들웨어
-app.use("/chat", chatRouter);
-app.use(express.json());
-app.use(cookieParser());
-app.use("/public", express.static(path.join(__dirname, "public")));
-
-//swagger ui 미들웨어 설정
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
 // CORS 설정
 app.use(
   cors({
@@ -107,6 +98,15 @@ app.use(
     credentials: true, // 쿠키 전송 허용
   })
 );
+
+// 미들웨어
+app.use("/chat", chatRouter);
+app.use(express.json());
+app.use(cookieParser());
+app.use("/public", express.static(path.join(__dirname, "public")));
+
+//swagger ui 미들웨어 설정
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // 라우터 연결
 app.use("/users", userRouter);
