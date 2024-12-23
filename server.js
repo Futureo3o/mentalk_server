@@ -35,6 +35,7 @@ const mentorIntroduceRouter = require("./routes/mentorIntroduceRouter.js");
 const warningRouter = require("./routes/warningRouter.js");
 const adminRouter = require("./routes/adminRouter.js");
 const signupAdminRouter = require("./routes/signupAdminRouter.js");
+const chatRouter = require("./routes/chatRouter.js");
 
 const favoriteRouter = require("./routes/favoriteRouter.js");
 const cookieParser = require("cookie-parser");
