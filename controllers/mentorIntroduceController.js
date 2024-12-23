@@ -1,6 +1,6 @@
 const MentorIntroduce = require("../models/mentorIntroduce");
 const Mentor = require("../models/mentor");
-//버튼 클릭 시 화면
+//멘토 아이디로 자기 소개페이지 리스트 조회
     const getMentorIntroduce = async(req,res)=>{
         //URL 요청 받음
         const {mentor_id} = req.params;        
@@ -31,7 +31,24 @@ const getMentorIntroduceList =async(req,res)=>{
         {
             return res.status(404).json({message:"자기 소개페이지가 존재하지 않습니다."});
         }
-        return res.status(200).json(IntroduceList);
+        const resultList =await Promise.all(
+            IntroduceList.map(async(introduce)=>{
+                const mentor =await Mentor.findOne({mentor_id:introduce.mentor_id});
+
+                if(mentor){
+                    return{
+                        ...introduce.toObject(),
+                        mentor:mentor,
+                    };
+                }else{
+                    return{
+                        ...introduce.toObject(),
+                        mentor:null,
+                    };
+                }
+            })
+        )
+        return res.status(200).json(resultList);
 
     }catch(error){
         return res.status(500).json({message: "서버 에러"});
