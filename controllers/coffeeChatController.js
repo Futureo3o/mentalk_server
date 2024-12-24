@@ -94,17 +94,59 @@ const getAllCoffeeChatByMentorID = async (req, res) => {
     if(!mentor){
       return res.status(404).json({error:"멘토 정보가 존재하지 않습니다."});
     }
-    const menteeIds = coffeechat.map(chat =>chat.mentee_id);
+    
+    const menteeIds = coffeechat.map(chat => chat.mentee_id);
+    const menteeList  = await Mentee.find({ mentee_id: { $in: menteeIds } });
 
-    const mentee = await Mentee.find({mentee_id:{$in:menteeIds}});
-
-    if(!mentee){
+    if(!menteeList ){
       return res.status(404).json({error: "멘티 정보가 존재하지 않습니다."});
     }
+    const result = coffeechat.map(chat => {
+      const mentee = menteeList .find(m => m.mentee_id === chat.mentee_id) || {}; // mentee에서 해당 mentee_id 찾기
+      return {
+        coffeechat: {
+          mentor_id: chat.mentor_id,
+          mentee_id: chat.mentee_id,
+          topic: chat.topic,
+          date: chat.date,
+        
+          mentor_id: mentor.mentor_id,
+          mentor_pw: mentor.mentor_pw,
+          mentor_email: mentor.mentor_email,
+          mentor_phone: mentor.mentor_phone,
+          mentor_nickname: mentor.mentor_nickname,
+          mentor_company: mentor.mentor_company,
+          mentor_category: mentor.mentor_category,
+          mentor_position: mentor.mentor_position,
+          mentor_img: mentor.mentor_img,
+          mentor_paper_img: mentor.mentor_paper_img,
+          mentor_career: mentor.mentor_career,
+          mentor_is_checked: mentor.mentor_is_checked,
+          mentor_social_login: mentor.mentor_social_login,
+          mentor_gender: mentor.mentor_gender,
+          mentor_warnning_count: mentor.mentor_warnning_count,
+          mentor_favorite_count: mentor.mentor_favorite_count,
+          mentor_suspension: mentor.mentor_suspension,
+        
+          mentee_id: mentee.mentee_id || null,
+          mentee_pw: mentee.mentee_pw || null,
+          mentee_email: mentee.mentee_email || null,
+          mentee_phone: mentee.mentee_phone || null,
+          mentee_nickname: mentee.mentee_nickname || null,
+          mentee_position: mentee.mentee_position || [],
+          mentee_img: mentee.mentee_img || null,
+          mentee_social_login: mentee.mentee_social_login || false,
+          mentee_gender: mentee.mentee_gender || null,
+          mentee_warnning_count: mentee.mentee_warnning_count || 0,
+          mentee_favorite_count: mentee.mentee_favorite_count || 0,
+          mentee_suspension: mentee.mentee_suspension || false,
+        },
+      };
+    });
 
-    res.status(200).json({ message: "멘토 아아디로 커피챗 조회가 성공하였습니다.", data: coffeechat,mentor,mentee, });
+    res.status(200).json({ message: "멘토 아아디로 커피챗 조회가 성공하였습니다.", data: result, });
   } catch (error) {
-    console.error("특정 멘토 아디로 조회한 커피챗 데이터 기능 실패");
+    console.error("특정 멘토 아이디로 조회한 커피챗 데이터 기능 실패");
     res.status(500).json({ error: "멘토아이디로 조회한 커피챗 목록 가져오기 기능 도중 에러가 발생했습니다." });
   }
 };
@@ -126,21 +168,55 @@ const getAllCoffeeChatByMenteeID = async (req, res) => {
       return res.status(404).json({ error: "멘티 정보가 존재하지 않습니다." });
     }
 
-    const mentorIds = coffeechat.map(chat => chat.mentor_id);
-
+    const mentorIds = coffeechat.map(chat => String(chat.mentor_id));
     const mentor = await Mentor.find({ mentor_id: { $in: mentorIds } });
 
-    if (!mentor) {
+    if (!mentor || mentor.length === 0) {
       return res.status(404).json({ error: "멘토 정보가 존재하지 않습니다." });
     }
 
+    const result = coffeechat.map(chat => {
+      const mentorData = mentor.find(m => m.mentor_id === chat.mentor_id) || {};
+      return {
+        coffeechat: {
+          mentor_id: chat.mentor_id,
+          mentee_id: chat.mentee_id,
+          topic: chat.topic,
+          date: chat.date,
+          mentor_pw: mentorData.mentor_pw || null,
+          mentor_email: mentorData.mentor_email || null,
+          mentor_phone: mentorData.mentor_phone || null,
+          mentor_nickname: mentorData.mentor_nickname || null,
+          mentor_company: mentorData.mentor_company || null,
+          mentor_category: mentorData.mentor_category || null,
+          mentor_position: mentorData.mentor_position || null,
+          mentor_img: mentorData.mentor_img || null,
+          mentor_paper_img: mentorData.mentor_paper_img || null,
+          mentor_career: mentorData.mentor_career || null,
+          mentor_is_checked: mentorData.mentor_is_checked || false,
+          mentor_social_login: mentorData.mentor_social_login || false,
+          mentor_gender: mentorData.mentor_gender || null,
+          mentor_warnning_count: mentorData.mentor_warnning_count || 0,
+          mentor_favorite_count: mentorData.mentor_favorite_count || 0,
+          mentor_suspension: mentorData.mentor_suspension || false,
+          mentee_pw: mentee.mentee_pw,
+          mentee_email: mentee.mentee_email,
+          mentee_phone: mentee.mentee_phone,
+          mentee_nickname: mentee.mentee_nickname,
+          mentee_position: mentee.mentee_position,
+          mentee_img: mentee.mentee_img,
+          mentee_social_login: mentee.mentee_social_login,
+          mentee_gender: mentee.mentee_gender,
+          mentee_warnning_count: mentee.mentee_warnning_count,
+          mentee_favorite_count: mentee.mentee_favorite_count,
+          mentee_suspension: mentee.mentee_suspension,
+        },
+      };
+    });
+
     res.status(200).json({
-      message: "멘티 아이디로 커피챗, 멘티, 멘토 정보 조회가 성공하였습니다.",
-      data: {
-        coffeechat,
-        mentee,
-        mentor,
-      },
+      message: "멘티 아아디로 커피챗 조회가 성공하였습니다.",
+      data: result,
     });
   } catch (error) {
     console.error("특정 멘티 아이디로 조회한 데이터 가져오기 실패", error);
@@ -149,6 +225,7 @@ const getAllCoffeeChatByMenteeID = async (req, res) => {
     });
   }
 };
+
 
 
 //커피챗 수정
