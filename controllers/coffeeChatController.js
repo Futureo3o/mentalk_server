@@ -6,20 +6,11 @@ const Mentee = require("../models/mentee.js");
 //커피챗 생성
 const createCoffeeChat = async (req, res) => {
   try {
-    const {
-      introduce_id,
-      mentor_id,
-      mentee_id,
-      coffee_request_date,
-      coffee_request,
-      coffee_wanted,
-    } = req.body;
+    const { introduce_id, mentor_id, mentee_id, coffee_request_date, coffee_request, coffee_wanted } = req.body;
 
     const mentorIntroduceId = await MentorIntroduce.findById(introduce_id);
     if (!mentorIntroduceId) {
-      return res
-        .status(404)
-        .json({ error: "유효하지 않은 멘토 아이디입니다." });
+      return res.status(404).json({ error: "유효하지 않은 멘토 아이디입니다." });
     }
 
     const mentor = await Mentor.findOne({ mentor_id: mentor_id });
@@ -31,9 +22,7 @@ const createCoffeeChat = async (req, res) => {
     const mentee = await Mentee.findOne({ mentee_id: mentee_id });
 
     if (!mentee) {
-      return res
-        .status(404)
-        .json({ error: "해당 멘티티가 존재하지 않습니다." });
+      return res.status(404).json({ error: "해당 멘티티가 존재하지 않습니다." });
     }
 
     const newCoffeeChat = new CoffeeChat({
@@ -70,9 +59,29 @@ const getAllCoffeeChat = async (req, res) => {
     res.status(200).json({ message: "커피챗 조회 성공했습니다.", data: data });
   } catch (error) {
     console.error("커피챗 조회 실패 : ", error);
-    res
-      .status(500)
-      .json({ error: "커피챗 조회 기능 도중 에러가 발생했습니다." });
+    res.status(500).json({ error: "커피챗 조회 기능 도중 에러가 발생했습니다." });
+  }
+};
+
+//커피챗 쿼리요청
+const getQueryCoffeeChat = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+
+    const offset = (page - 1) * limit;
+
+    const coffeeChats = await CoffeeChat.find().skip(offset).limit(limit);
+
+    res.status(200).json({
+      page,
+      limit,
+      data: coffeeChats,
+      message: "쿼리 요청이 성공했습니다.",
+    });
+  } catch (error) {
+    console.error("쿼리 요청 기능 실패 : ", error);
+    res.status(500).json({ error: "쿼리 요청 기능 도중 에러가 발생했습니다." });
   }
 };
 
@@ -83,19 +92,13 @@ const getCoffeeChatById = async (req, res) => {
     const coffeeChat = await CoffeeChat.findOne({ introduce_id: introduce_id });
 
     if (!coffeeChat) {
-      return res
-        .status(404)
-        .json({ error: "해당 커피챗이 존재하지 않습니다." });
+      return res.status(404).json({ error: "해당 커피챗이 존재하지 않습니다." });
     }
 
-    res
-      .status(200)
-      .json({ message: "커피챗 조회 성공하셨습니다.", data: coffeeChat });
+    res.status(200).json({ message: "커피챗 조회 성공하셨습니다.", data: coffeeChat });
   } catch (error) {
     console.error("커피챗 조회 실패 : ", error);
-    res
-      .status(500)
-      .json({ error: "특정 커피챗 조회 기능 도중 에러가 발생했습니다." });
+    res.status(500).json({ error: "특정 커피챗 조회 기능 도중 에러가 발생했습니다." });
   }
 };
 
@@ -121,8 +124,7 @@ const getAllCoffeeChatByMentorID = async (req, res) => {
       return res.status(404).json({ error: "멘티 정보가 존재하지 않습니다." });
     }
     const result = coffeechat.map((chat) => {
-      const mentee =
-        menteeList.find((m) => m.mentee_id === chat.mentee_id) || {}; // mentee에서 해당 mentee_id 찾기
+      const mentee = menteeList.find((m) => m.mentee_id === chat.mentee_id) || {}; // mentee에서 해당 mentee_id 찾기
 
       return {
         coffeechat: {
@@ -173,8 +175,7 @@ const getAllCoffeeChatByMentorID = async (req, res) => {
   } catch (error) {
     console.error("특정 멘토 아이디로 조회한 커피챗 데이터 기능 실패");
     res.status(500).json({
-      error:
-        "멘토아이디로 조회한 커피챗 목록 가져오기 기능 도중 에러가 발생했습니다.",
+      error: "멘토아이디로 조회한 커피챗 목록 가져오기 기능 도중 에러가 발생했습니다.",
     });
   }
 };
@@ -186,9 +187,7 @@ const getAllCoffeeChatByMenteeID = async (req, res) => {
     const coffeechat = await CoffeeChat.find({ mentee_id: mentee_id });
 
     if (!coffeechat || coffeechat.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "해당 멘티의 커피챗이 존재하지 않습니다." });
+      return res.status(404).json({ error: "해당 멘티의 커피챗이 존재하지 않습니다." });
     }
 
     const mentee = await Mentee.findOne({ mentee_id: mentee_id });
@@ -205,8 +204,7 @@ const getAllCoffeeChatByMenteeID = async (req, res) => {
     }
 
     const result = coffeechat.map((chat) => {
-      const mentor =
-        mentorList.find((m) => m.mentor_id === chat.mentor_id) || {};
+      const mentor = mentorList.find((m) => m.mentor_id === chat.mentor_id) || {};
       return {
         coffeechat: {
           coffeechat_id: chat._id,
@@ -265,26 +263,18 @@ const getAllCoffeeChatByMenteeID = async (req, res) => {
 const updateCoffeeChat = async (req, res) => {
   try {
     const { _id } = req.params;
-    const {
-      coffee_completed,
-      coffee_meeting_date,
-      coffee_status,
-      coffee_cancel,
-    } = req.body;
+    const { coffee_completed, coffee_meeting_date, coffee_status, coffee_cancel } = req.body;
 
     const coffeeChatData = await CoffeeChat.findOne({ _id: _id });
 
     if (!coffeeChatData) {
-      return res
-        .status(404)
-        .json({ error: "해당 커피챗이 존재하지 않습니다." });
+      return res.status(404).json({ error: "해당 커피챗이 존재하지 않습니다." });
     }
 
     if (coffee_completed) coffeeChatData.coffee_completed = coffee_completed;
     if (coffee_status) coffeeChatData.coffee_status = coffee_status;
     if (coffee_cancel) coffeeChatData.coffee_cancel = coffee_cancel;
-    if (coffee_meeting_date)
-      coffeeChatData.coffee_meeting_date = coffee_meeting_date;
+    if (coffee_meeting_date) coffeeChatData.coffee_meeting_date = coffee_meeting_date;
 
     await coffeeChatData.save();
     res.status(200).json({
@@ -293,9 +283,7 @@ const updateCoffeeChat = async (req, res) => {
     });
   } catch (error) {
     console.error("커피챗 수정 실패 : ", error);
-    res
-      .status(500)
-      .json({ error: "커피챗 수정 요청 기능 도중 에러가 발생했습니다." });
+    res.status(500).json({ error: "커피챗 수정 요청 기능 도중 에러가 발생했습니다." });
   }
 };
 
@@ -306,4 +294,5 @@ module.exports = {
   updateCoffeeChat,
   getAllCoffeeChatByMentorID,
   getAllCoffeeChatByMenteeID,
+  getQueryCoffeeChat,
 };
