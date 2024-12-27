@@ -29,10 +29,15 @@ const addFavorite = async (req, res) => {
     });
 
     await newFavorite.save();
+
+    mentor.mentor_favorite_count+=1;
+    await mentor.save();
+
     res.status(200).json({
       message: '멘토 자기소개 페이지가 즐겨찾기에 추가되었습니다.',
       mentor_id,
       mentee_id,
+      favorite_count:mentor.mentor_favorite_count,
     });
   } catch (error) {
     console.error(error);
@@ -59,8 +64,7 @@ const getFavoritescheck = async(req,res)=>{
     res.status(500).json({message: "즐겨찾기 조회 중 오류 발생",error:error});
   }
 }
-//1. 북마크를 클릭했을때 북마크가 없으면 생성
-//2. 이미 데이터 베이스에 존재하면 북마크 삭제
+
 //북마크 리스트 조회
 const getFavorites = async (req, res) => {
   const { mentee_id } = req.params;
@@ -129,11 +133,15 @@ const removeFavorite = async (req, res) => {
           message: '이 멘티는 해당 멘토를 즐겨찾기에 추가한 적이 없습니다.',
         });
       }
-  
+      const mentor =await Mentor.findOne({mentor_id});
+      mentor.mentor_favorite_count-=1;
+      await mentor.save();
+
       res.status(200).json({
         message: '멘토가 즐겨찾기에서 제거되었습니다.',
         mentor_id,
         mentee_id,
+         favorite_count:mentor.mentor_favorite_count,
       });
     } catch (error) {
       console.error(error);
