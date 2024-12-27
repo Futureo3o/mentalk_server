@@ -42,8 +42,26 @@ const addFavorite = async (req, res) => {
     });
   }
 };
-
-//북마크 조회
+// 북마크 체크
+const getFavoritescheck = async(req,res)=>{
+  const {mentor_id,mentee_id}=req.params;
+  try{
+      const favoriteCheck=await Favorite.findOne({
+        mentor_id:mentor_id,
+        mentee_id:mentee_id,
+      });
+      if(favoriteCheck){
+        return res.status(200).json({check:true});
+      }else{
+        return res.status(200).json({check:false});
+      }
+  }catch(error){
+    res.status(500).json({message: "즐겨찾기 조회 중 오류 발생",error:error});
+  }
+}
+//1. 북마크를 클릭했을때 북마크가 없으면 생성
+//2. 이미 데이터 베이스에 존재하면 북마크 삭제
+//북마크 리스트 조회
 const getFavorites = async (req, res) => {
   const { mentee_id } = req.params;
 
@@ -126,6 +144,6 @@ const removeFavorite = async (req, res) => {
     }
   };
   
-  module.exports = { addFavorite,getFavorites,removeFavorite };
+  module.exports = { addFavorite,getFavorites,removeFavorite,getFavoritescheck};
   
   
