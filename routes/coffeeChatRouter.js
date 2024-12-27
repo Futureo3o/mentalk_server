@@ -69,6 +69,45 @@ router.get("/", coffeeChatController.getAllCoffeeChat);
 
 /**
  * @swagger
+ * /coffeechat/filterdata:
+ *  get:
+ *    summary: 커피챗 데이터를 페이지별로 조회합니다.
+ *    description: 페이지 번호(`page`)만을 쿼리 파라미터로 받아 커피챗 데이터를 조회합니다. 한 페이지당 10개의 데이터를 반환합니다.
+ *    tags:
+ *      - coffeeChat
+ *    parameters:
+ *      - name: page
+ *        in: query
+ *        description: 조회할 페이지 번호 (기본값 1)
+ *        required: false
+ *        schema:
+ *          type: integer
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: 커피챗 조회 성공
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                page:
+ *                  type: integer
+ *                  description: 현재 페이지 번호
+ *                limit:
+ *                  type: integer
+ *                  description: 페이지당 항목 개수 (기본 10개)
+ *                data:
+ *                  type: array
+ *                  items:
+ *                    type: object
+ *                    description: 커피챗 데이터 항목
+ *      500:
+ *        description: 커피챗 조회 중 오류가 발생했습니다.
+ */
+router.get("/filterdata", coffeeChatController.getQueryCoffeeChat);
+/**
+ * @swagger
  * /coffeechat/introduce/{introduce_id}:
  *  get:
  *    summary: 특정 커피챗을 조회합니다.
@@ -140,7 +179,7 @@ router.get("/mentor/:mentor_id", coffeeChatController.getAllCoffeeChatByMentorID
  *      500:
  *        description: 커피챗 조회 중 오류가 발생했습니다.
  */
-router.get("/mentee/:mentee_id",coffeeChatController.getAllCoffeeChatByMenteeID);
+router.get("/mentee/:mentee_id", coffeeChatController.getAllCoffeeChatByMenteeID);
 /**
  * @swagger
  * /coffeechat/{introduce_id}:

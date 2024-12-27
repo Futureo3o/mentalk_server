@@ -92,7 +92,7 @@ server.listen(8081, () => {
 // CORS 설정.
 app.use(
   cors({
-    origin: "http://localhost:3000", // 허용할 도메인
+    origin: "http://localhost:3000", // 허용할 도메인.
     methods: "GET,HEAD,PUT,POST,DELETE", // 허용할 HTTP 메소드
     allowedHeaders: ["Authorization", "Content-Type"], // 허용할 헤더
     credentials: true, // 쿠키 전송 허용
