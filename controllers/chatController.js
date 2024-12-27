@@ -7,7 +7,7 @@ const getChat = async (req, res) => {
     res.status(200).json({ message: "이전 채팅 로딩 성공", data: chatList });
   } catch (error) {
     console.error("조회 실패 : ", error);
-    res.status(500).json({ error: "이전 채팅 로드 실패" });
+    res.status(500).json({ error: "이전 채팅 로드 실패." });
   }
 };
 
