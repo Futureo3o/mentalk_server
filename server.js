@@ -48,7 +48,7 @@ const app = express();
 
 const server = http.createServer(app);
 
-//챗 통신 서버 코드
+//챗 통신 서버 코드.
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
