@@ -29,10 +29,15 @@ const addFavorite = async (req, res) => {
     });
 
     await newFavorite.save();
+
+    mentor.mentor_favorite_count+=1;
+    await mentor.save();
+
     res.status(200).json({
       message: "멘토 자기소개 페이지가 즐겨찾기에 추가되었습니다.",
       mentor_id,
       mentee_id,
+      favorite_count:mentor.mentor_favorite_count,
     });
   } catch (error) {
     console.error(error);
@@ -58,9 +63,8 @@ const getFavoritescheck = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "즐겨찾기 조회 중 오류 발생", error: error });
   }
-};
-//1. 북마크를 클릭했을때 북마크가 없으면 생성
-//2. 이미 데이터 베이스에 존재하면 북마크 삭제
+}
+
 //북마크 리스트 조회
 const getFavorites = async (req, res) => {
   const { mentee_id } = req.params;
@@ -115,29 +119,34 @@ const getFavorites = async (req, res) => {
 
 //북마크 취소
 const removeFavorite = async (req, res) => {
-  const { mentor_id } = req.params;
-  const { mentee_id } = req.body;
+    const { mentor_id } = req.params;
+    const { mentee_id } = req.body;
+  
+    try {
+      const favorite = await Favorite.findOneAndDelete({ mentor_id, mentee_id });
+      
+      if (!favorite) {
+        return res.status(404).json({
+          error: '즐겨찾기 항목을 찾을 수 없습니다.',
+          message: '이 멘티는 해당 멘토를 즐겨찾기에 추가한 적이 없습니다.',
+        });
+      }
+      const mentor =await Mentor.findOne({mentor_id});
+      mentor.mentor_favorite_count-=1;
+      await mentor.save();
 
-  try {
-    const favorite = await Favorite.findOneAndDelete({ mentor_id, mentee_id });
-
-    if (!favorite) {
-      return res.status(404).json({
-        error: "즐겨찾기 항목을 찾을 수 없습니다.",
-        message: "이 멘티는 해당 멘토를 즐겨찾기에 추가한 적이 없습니다.",
+      res.status(200).json({
+        message: '멘토가 즐겨찾기에서 제거되었습니다.',
+        mentor_id,
+        mentee_id,
+         favorite_count:mentor.mentor_favorite_count,
       });
-    }
-
-    res.status(200).json({
-      message: "멘토가 즐겨찾기에서 제거되었습니다.",
-      mentor_id,
-      mentee_id,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: "서버 오류",
-      message: "즐겨찾기 삭제 중 오류가 발생했습니다.",
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        error: '서버 오류',
+        message: '즐겨찾기 삭제 중 오류가 발생했습니다.',
+ 
     });
   }
 };
