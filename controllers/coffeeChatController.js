@@ -60,31 +60,6 @@ const getAllCoffeeChat = async (req, res) => {
   } catch (error) {
     console.error("커피챗 조회 실패 : ", error);
     res.status(500).json({ error: "커피챗 조회 기능 도중 에러가 발생했습니다." });
-<<<<<<< HEAD
-=======
-  }
-};
-
-//커피챗 쿼리요청
-const getQueryCoffeeChat = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = 10;
-
-    const offset = (page - 1) * limit;
-
-    const coffeeChats = await CoffeeChat.find().skip(offset).limit(limit);
-
-    res.status(200).json({
-      page,
-      limit,
-      data: coffeeChats,
-      message: "쿼리 요청이 성공했습니다.",
-    });
-  } catch (error) {
-    console.error("쿼리 요청 기능 실패 : ", error);
-    res.status(500).json({ error: "쿼리 요청 기능 도중 에러가 발생했습니다." });
->>>>>>> 7cb663f56881ce6f2c626a51bdeda1715d3ef037
   }
 };
 
@@ -102,7 +77,6 @@ const getCoffeeChatById = async (req, res) => {
   } catch (error) {
     console.error("커피챗 조회 실패 : ", error);
     res.status(500).json({ error: "특정 커피챗 조회 기능 도중 에러가 발생했습니다." });
-<<<<<<< HEAD
   }
 };
 
@@ -122,8 +96,6 @@ const getQueryCoffeeChat = async (req, res) => {
   } catch (error) {
     console.error("쿼리 요청 기능 실패 : ", error);
     res.status(500).json({ error: "쿼리 요청 기능 도중 에러가 발생했습니다." });
-=======
->>>>>>> 7cb663f56881ce6f2c626a51bdeda1715d3ef037
   }
 };
 

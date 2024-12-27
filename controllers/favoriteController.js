@@ -66,9 +66,21 @@ const getFavorites = async (req, res) => {
       const mentor = mentors.find(m => m.mentor_id === fav.mentor_id);
       return {
         ...fav.toObject(),  
-        mentor_title: mentor ? mentor.mentor_title : null,
-        mentor_content: mentor ? mentor.mentor_content : null,
-        mentor_rating: mentor ? mentor.mentor_rating : null
+        mentor_email:mentor.mentor_email,
+        mentor_phone:mentor.mentor_phone,
+        mentor_nickname:mentor.mentor_nickname,
+        mentor_company:mentor.mentor_company,
+        mentor_category:mentor.mentor_category,
+        mentor_position:mentor.mentor_position,
+        mentor_img:mentor.mentor_img,
+        mentor_paper_img:mentor.mentor_paper_img,
+        mentor_career:mentor.mentor_career,
+        mentor_is_checked:mentor.mentor_is_checked,
+        mentor_social_login:mentor.mentor_social_login,
+        mentor_gender:mentor.mentor_gender,
+        mentor_warnning_count:mentor.mentor_warnning_count,
+        mentor_favorite_count:mentor.mentor_favorite_count,
+        mentor_suspension:mentor.mentor_suspension,
       };
     });
 
