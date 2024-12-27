@@ -181,6 +181,7 @@ router.post('/:mentor_id', favoriteController.addFavorite);
 
 router.get('/:mentee_id', favoriteController.getFavorites);
 
+router.get('/:mentor_id/:mentee_id',favoriteController.getFavoritescheck);
 /**
  * @swagger
  * /favorite/{mentor_id}:
