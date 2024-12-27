@@ -106,6 +106,7 @@ router.get("/", coffeeChatController.getAllCoffeeChat);
  *        description: 커피챗 조회 중 오류가 발생했습니다.
  */
 router.get("/filterdata", coffeeChatController.getQueryCoffeeChat);
+
 /**
  * @swagger
  * /coffeechat/introduce/{introduce_id}:
