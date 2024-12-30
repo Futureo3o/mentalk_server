@@ -109,6 +109,8 @@ const getReviewByMentor = async (req, res) => {
           return{
             ...review._doc,
             mentee_img:mentee?.mentee_img||null,
+            createdAt: review.createdAt.toISOString().split('T')[0],
+            updatedAt: review.updatedAt.toISOString().split('T')[0],
           }
         })
       );
