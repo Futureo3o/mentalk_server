@@ -93,11 +93,11 @@ const getReviewByMentor = async (req, res) => {
     }
   };
   
+  //introduce 아이디 조회
   const getReviewByIntroduce = async (req, res) => {
-    const { introduce_id } = req.params;  // 자기소개 페이지 고유 키
+    const { introduce_id } = req.params; 
     
     try {
-      // introduce_id 기준으로 리뷰 조회
       const reviews = await Review.find({ introduce_id: introduce_id });
   
       if (reviews.length === 0) {
