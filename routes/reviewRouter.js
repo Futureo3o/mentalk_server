@@ -13,7 +13,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /review/{coffeechat_id}/{mentee_id}:
+ * /review/{coffeechat_id}:
  *   post:
  *     summary: "리뷰 생성"
  *     description: "멘토와 멘티 사이의 커피챗에 대한 리뷰를 생성합니다."
@@ -25,14 +25,8 @@ const router = express.Router();
  *         required: true
  *         description: "커피챗의 고유 ID (MongoDB ObjectId 형식)"
  *         schema:
- *           type: string
+ *           type: objectId
  *           pattern: "^[0-9a-fA-F]{24}$"  
- *       - name: mentee_id
- *         in: path
- *         required: true
- *         description: "멘티의 고유 ID"
- *         schema:
- *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -40,6 +34,9 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             properties:
+ *               mentee_id:
+ *                 type: string
+ *                 description: "멘티의 고유 ID"
  *               review_content:
  *                 type: string
  *                 description: "리뷰 내용"
@@ -47,6 +44,7 @@ const router = express.Router();
  *                 type: number
  *                 description: "리뷰 평점 (1~5)"
  *             required:
+ *               - mentee_id
  *               - review_content
  *               - review_rating
  *     responses:
@@ -103,7 +101,7 @@ const router = express.Router();
  *                   type: string
  *                   example: "서버 오류가 발생했습니다."
  */
-router.post("/:coffeechat_id/:mentee_id", reviewController.createReview); // 리뷰 생성
+router.post("/:coffeechat_id", reviewController.createReview); // 리뷰 생성
 
 /**
  * @swagger
