@@ -94,53 +94,33 @@ const getReviewByMentor = async (req, res) => {
   };
   
   const getReviewByIntroduce = async (req, res) => {
-    const { introduce_id } = req.params;  
+    const { introduce_id } = req.params;  // 자기소개 페이지 고유 키
     
     try {
-     
+      // introduce_id 기준으로 리뷰 조회
       const reviews = await Review.find({ introduce_id: introduce_id });
   
       if (reviews.length === 0) {
         return res.status(404).json({ message: '이 자기소개 페이지에 대한 리뷰가 없습니다.' });
       }
-      const mentee_ids = reviews.map((review) => review.mentee_id);
-      const mentees = await Mentee.find({ mentee_id: { $in: mentee_ids } });
-      const menteeMap = mentees.reduce((map, mentee) => {
-        map[mentee.mentee_id] = mentee;
-        return map;
-      }, {});
-
-      const review_mentee = reviews.map((review) => {
-        const mentee = menteeMap[review.mentee_id];
-        return {
-          _id: review._id,
-          content: review.content,
-          mentee: mentee
-            ? { 
-                mentee_id: mentee.mentee_id,
-                mentee_nickname: mentee.mentee_nickname,
-                mentee_email: mentee.mentee_email,
-                mentee_phone: mentee.mentee_phone,
-                mentee_gender: mentee.mentee_gender,
-                mentee_img: mentee.mentee_img,
-                mentee_social_login: mentee.mentee_social_login,
-                mentee_warnning_count: mentee.mentee_warnning_count,
-                mentee_favorite_count: mentee.mentee_favorite_count,
-                mentee_suspension: mentee.mentee_suspension,
-              }
-            : null,
-        };
-      });
-
+      const review_mentee = await Promise.all(
+        reviews.map(async(review)=>{
+          const mentee=await Mentee.findOne({mentee_id:review.mentee_id});
+          return{
+            ...review._doc,
+            mentee_img:mentee?.mentee_img||null,
+          }
+        })
+      );
       res.status(200).json({
         message: '자기소개 페이지에 대한 모든 리뷰를 조회했습니다.',
-        reviews: review_mentee, 
+        reviews: review_mentee,  
       });
     } catch (error) {
+      console.error(error);
       res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
   };
-
   const updateReview = async (req, res) => {
     const { review_id } = req.params;  
     const { review_content, review_rating } = req.body; 
@@ -170,7 +150,6 @@ const getReviewByMentor = async (req, res) => {
       res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
   };
-
   const deleteReview = async (req, res) => {
     const { review_id } = req.params;  
     
