@@ -6,9 +6,8 @@ const Mentee = require("../models/mentee");
 
 const createReview = async (req, res) => {
     try {
-      const { coffeechat_id, mentee_id } = req.params;
-      const { review_content, review_rating } = req.body;
-  
+      const { coffeechat_id} = req.params;
+      const { mentee_id,review_content, review_rating } = req.body;
       if (!review_content || !review_rating) {
         return res.status(400).json({ message: '리뷰 콘텐츠와 평점은 반드시 입력해야 합니다.' });
       }
