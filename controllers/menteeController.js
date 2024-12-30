@@ -237,25 +237,42 @@ const menteeAccessToken = async (req, res) => {
       return res.status(401).json({ error: "로그인이 필요합니다." });
     }
 
-    const decoded = jwt.verify(token, process.env.MENTEE_ACCESS_SECRET);
+    try {
+      const decoded = jwt.verify(token, process.env.MENTEE_ACCESS_SECRET);
+      const user = await Mentee.findOne({ mentee_id: decoded.mentee_id });
 
-    const user = await Mentee.findOne({ mentee_id: decoded.mentee_id });
+      if (!user) {
+        return res.status(404).json({ error: "해당 멘티를 찾을 수 없습니다.." });
+      }
 
-    if (!user) {
-      return res.status(404).json({ error: "해당 멘토를 찾을 수 없습니다." });
+      res.status(200).json({
+        message: "멘티 정보 조회 성공",
+        data: {
+          mentee_id: user.mentee_id,
+          mentee_nickname: user.mentee_nickname,
+          mentee_email: user.mentee_email,
+          mentee_phone: user.mentee_phone,
+          mentee_position: user.mentee_position,
+          mentee_img: user.mentee_img,
+        },
+      });
+    } catch (err) {
+      // TokenExpiredError 처리
+      if (err.name === "TokenExpiredError") {
+        console.log("엑세스 토큰 만료");
+
+        // 리프레시 토큰으로 새로운 액세스 토큰을 발급하는 로직 추가
+        return res.status(401).json({
+          error: "엑세스 토큰이 만료되었습니다. 리프레시 토큰을 사용하여 새 토큰을 발급해주세요.",
+        });
+      }
+
+      console.error("엑세스 토큰 검증 실패 : ", err);
+      res.status(500).json({
+        error: "엑세스 토큰 검증 중 오류가 발생했습니다.",
+        details: err.message,
+      });
     }
-
-    res.status(200).json({
-      message: "멘티 정보 조회 성공",
-      data: {
-        mentee_id: user.mentee_id,
-        mentee_nickname: user.mentee_nickname,
-        mentee_email: user.mentee_email,
-        mentee_phone: user.mentee_phone,
-        mentee_position: user.mentee_position,
-        mentee_img: user.mentee_img,
-      },
-    });
   } catch (error) {
     console.error("엑세스 토큰 검증 실패 : ", error);
     res.status(500).json({
