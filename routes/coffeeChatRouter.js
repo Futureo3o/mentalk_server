@@ -155,7 +155,10 @@ router.get("/introduce/:introduce_id", coffeeChatController.getCoffeeChatById);
  *      500:
  *        description: 커피챗 조회 중 오류가 발생했습니다.
  */
-router.get("/mentor/:mentor_id", coffeeChatController.getAllCoffeeChatByMentorID);
+router.get(
+  "/mentor/:mentor_id",
+  coffeeChatController.getAllCoffeeChatByMentorID
+);
 
 /**
  * @swagger
@@ -180,7 +183,10 @@ router.get("/mentor/:mentor_id", coffeeChatController.getAllCoffeeChatByMentorID
  *      500:
  *        description: 커피챗 조회 중 오류가 발생했습니다.
  */
-router.get("/mentee/:mentee_id", coffeeChatController.getAllCoffeeChatByMenteeID);
+router.get(
+  "/mentee/:mentee_id",
+  coffeeChatController.getAllCoffeeChatByMenteeID
+);
 /**
  * @swagger
  * /coffeechat/{introduce_id}:
@@ -223,5 +229,30 @@ router.get("/mentee/:mentee_id", coffeeChatController.getAllCoffeeChatByMenteeID
  *        description: 커피챗 수정 중 오류가 발생했습니다.
  */
 router.put("/:_id", coffeeChatController.updateCoffeeChat);
+
+/**
+ * @swagger
+ *  /coffeechat/{coffeechat_id}:
+ *  get:
+ *    summary: 커피챗 고유 id로 커피챗을 조회합니다.
+ *    description: 특정 커피챗을 조회합니다.
+ *    tags:
+ *      - coffeeChat
+ *    parameters:
+ *      - name: mentee_id
+ *        in: path
+ *        description: 조회할 커피챗의 멘티 ID
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      200:
+ *        description: 특정 멘티의 커피챗 조회 성공
+ *      404:
+ *        description: 해당 커피챗이 존재하지 않습니다.
+ *      500:
+ *        description: 커피챗 조회 중 오류가 발생했습니다.
+ */
+router.get("/:coffeechat_id", coffeeChatController.getCoffeeChatByCoffeechatId);
 
 module.exports = router;
