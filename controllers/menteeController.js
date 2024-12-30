@@ -242,7 +242,7 @@ const menteeAccessToken = async (req, res) => {
       const user = await Mentee.findOne({ mentee_id: decoded.mentee_id });
 
       if (!user) {
-        return res.status(404).json({ error: "해당 멘티를 찾을 수 없습니다." });
+        return res.status(404).json({ error: "해당 멘티를 찾을 수 없습니다.." });
       }
 
       res.status(200).json({
