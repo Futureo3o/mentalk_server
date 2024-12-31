@@ -14,7 +14,9 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage }).fields([{ name: "mentee_img", maxCount: 1 }]);
+const upload = multer({ storage: storage }).fields([
+  { name: "mentee_img", maxCount: 1 },
+]);
 
 //멘티 유저 생성
 const createMenteeUser = async (req, res) => {
@@ -121,7 +123,8 @@ const getMenteeUserById = async (req, res) => {
 const updateMenteeUserById = async (req, res) => {
   try {
     const { mentee_id } = req.params;
-    const { mentee_nickname, mentee_position } = req.body;
+    const { mentee_nickname } = req.body;
+    const mentee_position = JSON.parse(req.body.mentee_position);
     let { mentee_img } = req.body;
 
     //파일 업로드 처리
@@ -134,7 +137,9 @@ const updateMenteeUserById = async (req, res) => {
     const user = await Mentee.findOne({ mentee_id: mentee_id });
 
     if (!user) {
-      return res.status(404).json({ error: "찾는 유저 id가 존재하질 않습니다." });
+      return res
+        .status(404)
+        .json({ error: "찾는 유저 id가 존재하질 않습니다." });
     }
 
     const fixData = { mentee_img, mentee_nickname, mentee_position };
@@ -144,10 +149,14 @@ const updateMenteeUserById = async (req, res) => {
     if (mentee_position) user.mentee_position = mentee_position;
 
     await user.save();
-    res.status(200).json({ message: "유저를 성공적으로 수정하였습니다.", data: fixData });
+    res
+      .status(200)
+      .json({ message: "유저를 성공적으로 수정하였습니다.", data: fixData });
   } catch (error) {
     console.error("멘티 유저 정보 실패 : ", error);
-    res.status(500).json({ error: "유저를 업데이트하는 도중 오류가 발생했습니다." });
+    res
+      .status(500)
+      .json({ error: "유저를 업데이트하는 도중 오류가 발생했습니다." });
   }
 };
 
@@ -158,7 +167,9 @@ const deleteMenteeUserById = async (req, res) => {
     const deleteduser = await Mentee.findOne({ mentee_id: mentee_id });
 
     if (!deleteduser) {
-      return res.status(404).json({ error: "삭제 하려는 id가 존재하지 않습니다." });
+      return res
+        .status(404)
+        .json({ error: "삭제 하려는 id가 존재하지 않습니다." });
     }
     await Mentee.deleteOne({ mentee_id });
 
@@ -168,7 +179,9 @@ const deleteMenteeUserById = async (req, res) => {
     });
   } catch (error) {
     console.error("멘티 유저 삭제 실패 : ", error);
-    res.status(500).json({ error: "유저를 삭제하는 도중 오류가 발생했습니다." });
+    res
+      .status(500)
+      .json({ error: "유저를 삭제하는 도중 오류가 발생했습니다." });
   }
 };
 
@@ -179,7 +192,9 @@ const loginMenteeUser = async (req, res) => {
     const user = await Mentee.findOne({ mentee_id: mentee_id });
 
     if (!user) {
-      return res.status(404).json({ error: "멘티 아이디가 존재하지 않거나 잘못 입력하셨습니다." });
+      return res
+        .status(404)
+        .json({ error: "멘티 아이디가 존재하지 않거나 잘못 입력하셨습니다." });
     }
 
     const isMatch = await bcrypt.compare(mentee_pw, user.mentee_pw);
@@ -222,7 +237,11 @@ const loginMenteeUser = async (req, res) => {
       httpOnly: false,
     });
 
-    return res.status(200).json({ message: "로그인 성공", accessToken: accessToken, refreshToken: refreshToken });
+    return res.status(200).json({
+      message: "로그인 성공",
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
   } catch (error) {
     console.error("멘티 로그인 실패 : ", error);
     res.status(500).json({ error: "멘티 로그인 기능에 오류가 발생했습니다." });
@@ -299,7 +318,10 @@ const menteeRefreshToken = async (req, res) => {
       httpOnly: false,
     });
 
-    res.status(200).json({ message: "새로운 액세스 토큰이 발급되었습니다.", accessToken: newAccessToken });
+    res.status(200).json({
+      message: "새로운 액세스 토큰이 발급되었습니다.",
+      accessToken: newAccessToken,
+    });
   } catch (error) {
     console.error("리프레쉬 토큰 검증 실패 : ", error);
     res.status(500).json({
