@@ -9,7 +9,7 @@ const createReview = async (req, res) => {
     const { coffeechat_id } = req.params;
     const { mentee_id, review_content, review_rating } = req.body;
     if (!review_content || !review_rating) {
-      return res.status(400).json({ message: "리뷰 콘텐츠와 평점은 반드시 입력해야 합니다.." });
+      return res.status(400).json({ message: "리뷰 콘텐츠와 평점은 반드시 입력해야 합니다." });
     }
 
     if (review_rating < 1 || review_rating > 5) {
@@ -86,20 +86,30 @@ const getReviewByMentee = async (req, res) => {
   }
 };
 
+//introduce 아이디 조회
 const getReviewByIntroduce = async (req, res) => {
-  const { introduce_id } = req.params; // 자기소개 페이지 고유 키
+  const { introduce_id } = req.params;
 
   try {
-    // introduce_id 기준으로 리뷰 조회
     const reviews = await Review.find({ introduce_id: introduce_id });
 
     if (reviews.length === 0) {
       return res.status(404).json({ message: "이 자기소개 페이지에 대한 리뷰가 없습니다." });
     }
-
+    const review_mentee = await Promise.all(
+      reviews.map(async (review) => {
+        const mentee = await Mentee.findOne({ mentee_id: review.mentee_id });
+        return {
+          ...review._doc,
+          mentee_img: mentee?.mentee_img || null,
+          createdAt: review.createdAt.toISOString().split("T")[0],
+          updatedAt: review.updatedAt.toISOString().split("T")[0],
+        };
+      })
+    );
     res.status(200).json({
       message: "자기소개 페이지에 대한 모든 리뷰를 조회했습니다.",
-      reviews: reviews, // 리뷰 내용만 반환
+      reviews: review_mentee,
     });
   } catch (error) {
     console.error(error);
